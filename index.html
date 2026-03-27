@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NW Pennsylvania &amp; Western NY Thrift Directory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0A0A0A;--white:#F2EDE4;--accent:#FF2D78;
+  --mid:#141414;--rule:#2A2A2A;--muted:#777;
+  --erie:#2563EB;--crawford:#16A34A;--venango:#DC2626;
+  --chautauqua:#2563EB;--cattaraugus:#7C3AED;--erieny:#16A34A;
+  --fd:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:var(--fb);line-height:1.6}
+/* NAV */
+nav{position:sticky;top:0;z-index:3000;background:var(--black);border-bottom:2px solid var(--accent);display:flex;height:46px;overflow-x:auto;white-space:nowrap}
+nav a{font-family:var(--fd);font-size:.95rem;letter-spacing:.1em;color:var(--white);text-decoration:none;padding:0 18px;height:46px;display:inline-flex;align-items:center;border-right:1px solid var(--rule);flex-shrink:0;transition:color .15s,background .15s}
+nav a:first-child{border-left:1px solid var(--rule)}.
+nav a:hover{color:var(--accent);background:#111}
+/* HERO */
+#hero{background:var(--black);border-bottom:3px solid var(--accent);padding:72px 40px 56px;position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,var(--rule) 39px,var(--rule) 40px);opacity:.15;pointer-events:none}
+.hi{position:relative;z-index:1;max-width:1100px}
+.eyebrow{font-family:var(--fd);font-size:.85rem;letter-spacing:.3em;color:var(--accent);margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.eyebrow::after{content:'';flex:1;height:1px;background:var(--accent);max-width:100px}
+h1{font-family:var(--fd);font-size:clamp(3.2rem,8vw,7.5rem);line-height:.93;letter-spacing:.02em;color:var(--white);margin-bottom:22px}
+h1 em{color:var(--accent);font-style:normal}
+.tagline{font-size:1.05rem;color:var(--muted);max-width:560px;border-left:3px solid var(--accent);padding-left:14px;line-height:1.6}
+.stats{display:flex;gap:36px;margin-top:44px;flex-wrap:wrap}
+.stat{border-top:2px solid var(--rule);padding-top:12px;min-width:110px}
+.snum{font-family:var(--fd);font-size:2.8rem;color:var(--accent);line-height:1}
+.slbl{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+/* SECTIONS */
+.sec{padding:60px 40px;border-bottom:1px solid var(--rule)}
+.sec-inner{max-width:1100px;margin:0 auto}
+.sec-lbl{font-family:var(--fd);font-size:.8rem;letter-spacing:.3em;color:var(--accent);margin-bottom:6px}
+.sec-title{font-family:var(--fd);font-size:clamp(2rem,4vw,3.5rem);letter-spacing:.03em;margin-bottom:28px;line-height:1}
+/* ABOUT */
+.about-txt{font-size:1.1rem;color:#C4BFB7;max-width:760px;line-height:1.8;border-left:3px solid var(--rule);padding-left:22px}
+.about-txt strong{color:var(--white)}
+/* TIPS */
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:2px;background:var(--rule)}
+.tip{background:var(--mid);padding:26px 22px;display:flex;gap:18px;transition:background .15s}
+.tip:hover{background:#1c1c1c}
+.tnum{font-family:var(--fd);font-size:3.2rem;color:var(--accent);line-height:1;flex-shrink:0;width:48px}
+.tip h3{font-family:var(--fd);font-size:1.15rem;letter-spacing:.05em;color:var(--white);margin-bottom:5px}
+.tip p{font-size:.85rem;color:#999;line-height:1.55}
+/* MAP SECTION */
+.mapsec{border-bottom:1px solid var(--rule)}
+.mhdr{background:var(--mid);border-bottom:2px solid var(--rule);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.mhdr h2{font-family:var(--fd);font-size:1.5rem;letter-spacing:.06em}
+.mhdr-lbl{font-size:.7rem;font-family:var(--fd);letter-spacing:.2em;color:var(--accent);margin-bottom:2px}
+.cleg-wrap{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.cleg{display:flex;align-items:center;gap:6px;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:3px 8px;border:1.5px solid transparent;transition:all .15s;user-select:none}
+.cleg:hover{border-color:currentColor}
+.cleg.dim{opacity:.28}
+.cdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.mlayout{display:flex;height:510px}
+.msb{width:255px;flex-shrink:0;background:#0D0D0D;border-right:1px solid var(--rule);display:flex;flex-direction:column;overflow:hidden;transition:width .22s}
+.msb.col{width:0}
+.mtog{background:#141414;border-right:1px solid var(--rule);width:20px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.62rem;color:var(--muted);transition:background .15s}
+.mtog:hover{background:#1e1e1e;color:var(--white)}
+.sb-srch{padding:9px;border-bottom:1px solid var(--rule)}
+.sb-srch input{width:100%;padding:7px 11px;background:#0A0A0A;border:1px solid var(--rule);color:var(--white);font-family:var(--fb);font-size:.78rem;outline:none}
+.sb-srch input:focus{border-color:var(--accent)}
+.sb-srch input::placeholder{color:var(--muted)}
+.sb-flt{padding:7px 9px;border-bottom:1px solid var(--rule);display:flex;gap:4px;flex-wrap:wrap}
+.sf{padding:2px 7px;font-size:.67rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--rule);cursor:pointer;background:transparent;color:var(--muted);font-family:var(--fb);transition:all .15s}
+.sf.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sb-cnt{font-size:.66rem;color:var(--muted);padding:4px 12px;border-bottom:1px solid var(--rule);letter-spacing:.08em;text-transform:uppercase}
+.sb-lst{flex:1;overflow-y:auto}
+.sb-lst::-webkit-scrollbar{width:3px}
+.sb-lst::-webkit-scrollbar-track{background:#0A0A0A}
+.sb-lst::-webkit-scrollbar-thumb{background:var(--rule)}
+.si{padding:8px 11px;cursor:pointer;border-left:3px solid transparent;transition:background .1s}
+.si:hover{background:#1A1A1A}
+.si.act{background:#1A1A1A}
+.sn{font-size:.78rem;font-weight:700;color:var(--white);line-height:1.3}
+.sm{font-size:.67rem;color:var(--muted);display:flex;gap:5px;align-items:center;margin-top:2px;flex-wrap:wrap}
+.cbadge{font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 5px}
+.mwrap{flex:1;position:relative}
+.mwrap > div{height:100%!important;width:100%!important}
+.leaflet-popup-content-wrapper{background:#111!important;border:1px solid #333!important;border-radius:0!important;box-shadow:4px 4px 0 rgba(0,0,0,.9)!important;padding:0!important}
+.leaflet-popup-content{margin:0!important;min-width:195px}
+.leaflet-popup-tip{background:#111!important}
+.pi{padding:13px 15px;font-family:var(--fb)}
+.pc{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.pn{font-family:var(--fd);font-size:1rem;letter-spacing:.04em;color:var(--white);margin-bottom:3px}
+.pt{font-size:.68rem;color:var(--muted);margin-bottom:7px}
+.pa,.pp{font-size:.7rem;color:#CCC;display:flex;gap:5px;margin-bottom:2px}
+.ph{font-size:.67rem;color:var(--muted);margin-top:7px;padding-top:7px;border-top:1px solid var(--rule);line-height:1.4}
+.nr{padding:24px 12px;text-align:center;color:var(--muted);font-family:var(--fd);font-size:1.1rem;letter-spacing:.08em}
+/* LIST */
+.lstsec{padding:48px 32px;border-bottom:1px solid var(--rule)}
+.lsthdr{max-width:1100px;margin:0 auto 20px}
+.lsthdr h2{font-family:var(--fd);font-size:2.4rem;letter-spacing:.05em;margin-bottom:14px}
+.lfilt{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.lf{padding:4px 12px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid var(--rule);cursor:pointer;background:transparent;color:var(--muted);font-family:var(--fb);transition:all .15s}
+.lf.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.lcnt{font-size:.68rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.tbl{max-width:1100px;margin:0 auto;width:100%;border-collapse:collapse}
+.tbl thead tr{background:var(--accent)}
+.tbl thead th{font-family:var(--fd);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:#fff;padding:9px 13px;text-align:left;white-space:nowrap}
+.tbl tbody tr{border-bottom:1px solid var(--rule);transition:background .1s}
+.tbl tbody tr:nth-child(even){background:rgba(255,255,255,.022)}
+.tbl tbody tr:hover{background:#1A1A1A}
+.tbl td{padding:9px 13px;font-size:.8rem;color:#CCC;vertical-align:top}
+.tbl .tn{font-weight:700;color:var(--white);font-size:.83rem}
+.tbl .th{color:var(--muted);font-size:.73rem;max-width:200px;line-height:1.35}
+.tbadge{font-size:.6rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;display:inline-block}
+/* FOOTER */
+footer{background:var(--mid);border-top:2px solid var(--accent);padding:28px 40px;text-align:center}
+footer p{font-size:.78rem;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
+footer strong{color:var(--white)}
+/* RESPONSIVE */
+@media(max-width:768px){
+  #hero{padding:44px 18px 36px}
+  .sec{padding:44px 18px}
+  .msb{position:absolute;top:0;left:0;height:100%;z-index:400;box-shadow:4px 0 20px rgba(0,0,0,.8)}
+  .mlayout{height:460px;position:relative}
+  .lstsec{padding:36px 14px}
+  .tbl{display:block;overflow-x:auto}
+  nav a{font-size:.82rem;padding:0 11px}
+  .mhdr{padding:12px 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#about">About</a>
+  <a href="#tips">Tips</a>
+  <a href="#pa-map">PA Map</a>
+  <a href="#wny-map">WNY Map</a>
+  <a href="#pa-list">PA List</a>
+  <a href="#wny-list">WNY List</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hi">
+    <div class="eyebrow">Compiled March 2026</div>
+    <!-- EDIT: Main headline -->
+    <h1>NW Pennsylvania<br>&amp; <em>Western NY</em><br>Thrift Directory</h1>
+    <!-- EDIT: Tagline -->
+    <p class="tagline">176 stores across 6 counties. Thrift shops, antique malls, consignment stores, and resale shops — all in one place.</p>
+    <div class="stats">
+      <div class="stat"><div class="snum">77</div><div class="slbl">PA Stores</div></div>
+      <div class="stat"><div class="snum">99</div><div class="slbl">WNY Stores</div></div>
+      <div class="stat"><div class="snum">6</div><div class="slbl">Counties</div></div>
+      <div class="stat"><div class="snum">176</div><div class="slbl">Total</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="sec">
+  <div class="sec-inner">
+    <div class="sec-lbl">What Is This</div>
+    <h2 class="sec-title">About the Directory</h2>
+    <!-- EDIT: About blurb -->
+    <p class="about-txt">This is a <strong>compiled, research-verified guide</strong> to thrift stores, consignment shops, antique malls, and resale shops across <strong>Erie County PA, Crawford County PA, Venango County PA</strong>, and <strong>Western New York</strong> (Chautauqua, Cattaraugus, and Erie County NY). Every listing has been cross-referenced against current Facebook pages and Google listings. <strong>Hours change without notice.</strong> Stores close. New ones open. Always call ahead before making a trip — every listing marked "Call ahead to verify" means exactly that.</p>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section id="tips" class="sec">
+  <div class="sec-inner">
+    <div class="sec-lbl">Before You Go</div>
+    <h2 class="sec-title">6 Rules for This Region</h2>
+    <!-- EDIT: Tips — modify text or add/remove .tip divs -->
+    <div class="tips">
+      <div class="tip"><div class="tnum">01</div><div><h3>Always Call Ahead</h3><p>Many stores run on limited or seasonal hours. A 60-second call saves a 45-minute drive. If this directory says "Call ahead to verify," treat that seriously.</p></div></div>
+      <div class="tip"><div class="tnum">02</div><div><h3>Go Weekday Mornings</h3><p>The best selection is gone by Saturday afternoon. Tuesday through Thursday before noon is when fresh inventory hits the floor and competition is lowest.</p></div></div>
+      <div class="tip"><div class="tnum">03</div><div><h3>Goodwill &amp; Salvation Army Restock Mid-Week</h3><p>Most locations process donations and put out new inventory Tuesday through Thursday. Weekend shoppers are working through what's left.</p></div></div>
+      <div class="tip"><div class="tnum">04</div><div><h3>Antique Malls Have Individual Vendor Hours</h3><p>The building may be open but a specific booth may not be staffed. If you're driving for one vendor, call the mall first and ask about that dealer's schedule.</p></div></div>
+      <div class="tip"><div class="tnum">05</div><div><h3>Estate Sales Move Fast</h3><p>Arrive before opening on day one for the best picks. Return on the final day for steep discounts — many sales drop 50–75% to clear everything out.</p></div></div>
+      <div class="tip"><div class="tnum">06</div><div><h3>Follow Stores on Facebook</h3><p>Pop-up sales, surprise closures, new inventory drops — Facebook is how this region's thrift stores communicate in real time. The store's page is your best source of truth.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PA MAP -->
+<div id="pa-map" class="mapsec">
+  <div class="mhdr">
+    <div><div class="mhdr-lbl">Interactive Map</div><h2>Pennsylvania — Erie, Crawford &amp; Venango</h2></div>
+    <div class="cleg-wrap">
+      <div class="cleg" style="color:var(--erie)" onclick="paTogCo('Erie',this)"><div class="cdot" style="background:var(--erie)"></div>Erie</div>
+      <div class="cleg" style="color:var(--crawford)" onclick="paTogCo('Crawford',this)"><div class="cdot" style="background:var(--crawford)"></div>Crawford</div>
+      <div class="cleg" style="color:var(--venango)" onclick="paTogCo('Venango',this)"><div class="cdot" style="background:var(--venango)"></div>Venango</div>
+    </div>
+  </div>
+  <div class="mlayout" style="position:relative">
+    <div class="msb" id="pa-sb">
+      <div class="sb-srch"><input id="pa-q" placeholder="Search stores, towns…" oninput="paFilter()"></div>
+      <div class="sb-flt">
+        <button class="sf on" onclick="paSetType('All',this)">All</button>
+        <button class="sf" onclick="paSetType('Thrift',this)">Thrift</button>
+        <button class="sf" onclick="paSetType('Antique',this)">Antique</button>
+        <button class="sf" onclick="paSetType('Consignment',this)">Consign</button>
+        <button class="sf" onclick="paSetType('Vintage',this)">Vintage</button>
+      </div>
+      <div class="sb-cnt" id="pa-cnt">Loading…</div>
+      <div class="sb-lst" id="pa-list"></div>
+    </div>
+    <div class="mtog" id="pa-tog" onclick="paTogSB()">◀</div>
+    <div class="mwrap"><div id="pa-map-el"></div></div>
+  </div>
+</div>
+
+<!-- WNY MAP -->
+<div id="wny-map" class="mapsec">
+  <div class="mhdr">
+    <div><div class="mhdr-lbl">Interactive Map</div><h2>Western New York — Chautauqua, Cattaraugus &amp; Erie NY</h2></div>
+    <div class="cleg-wrap">
+      <div class="cleg" style="color:var(--chautauqua)" onclick="wnyTogCo('Chautauqua',this)"><div class="cdot" style="background:var(--chautauqua)"></div>Chautauqua</div>
+      <div class="cleg" style="color:var(--cattaraugus)" onclick="wnyTogCo('Cattaraugus',this)"><div class="cdot" style="background:var(--cattaraugus)"></div>Cattaraugus</div>
+      <div class="cleg" style="color:var(--erieny)" onclick="wnyTogCo('Erie NY',this)"><div class="cdot" style="background:var(--erieny)"></div>Erie NY</div>
+    </div>
+  </div>
+  <div class="mlayout" style="position:relative">
+    <div class="msb" id="wny-sb">
+      <div class="sb-srch"><input id="wny-q" placeholder="Search stores, towns…" oninput="wnyFilter()"></div>
+      <div class="sb-flt">
+        <button class="sf on" onclick="wnySetType('All',this)">All</button>
+        <button class="sf" onclick="wnySetType('Thrift',this)">Thrift</button>
+        <button class="sf" onclick="wnySetType('Antique',this)">Antique</button>
+        <button class="sf" onclick="wnySetType('Consignment',this)">Consign</button>
+        <button class="sf" onclick="wnySetType('Vintage',this)">Vintage</button>
+      </div>
+      <div class="sb-cnt" id="wny-cnt">Loading…</div>
+      <div class="sb-lst" id="wny-list"></div>
+    </div>
+    <div class="mtog" id="wny-tog" onclick="wnyTogSB()">◀</div>
+    <div class="mwrap"><div id="wny-map-el"></div></div>
+  </div>
+</div>
+
+<!-- PA LIST -->
+<div id="pa-list-sec" class="lstsec">
+  <div class="lsthdr">
+    <div class="sec-lbl">Full Directory</div>
+    <h2>Pennsylvania Stores</h2>
+    <div class="lfilt" id="pa-lf-county">
+      <button class="lf on" onclick="paListFilter('county','All',this)">All Counties</button>
+      <button class="lf" onclick="paListFilter('county','Erie',this)">Erie</button>
+      <button class="lf" onclick="paListFilter('county','Crawford',this)">Crawford</button>
+      <button class="lf" onclick="paListFilter('county','Venango',this)">Venango</button>
+    </div>
+    <div class="lfilt" id="pa-lf-type">
+      <button class="lf on" onclick="paListFilter('type','All',this)">All Types</button>
+      <button class="lf" onclick="paListFilter('type','Thrift',this)">Thrift</button>
+      <button class="lf" onclick="paListFilter('type','Antique',this)">Antique</button>
+      <button class="lf" onclick="paListFilter('type','Consignment',this)">Consignment</button>
+      <button class="lf" onclick="paListFilter('type','Vintage',this)">Vintage</button>
+    </div>
+    <div class="lcnt" id="pa-lcnt"></div>
+  </div>
+  <table class="tbl" id="pa-tbl">
+    <thead><tr><th>Store</th><th>County</th><th>Type</th><th>Address</th><th>Phone</th><th>Hours</th></tr></thead>
+    <tbody id="pa-tbody"></tbody>
+  </table>
+</div>
+
+<!-- WNY LIST -->
+<div id="wny-list-sec" class="lstsec">
+  <div class="lsthdr">
+    <div class="sec-lbl">Full Directory</div>
+    <h2>Western New York Stores</h2>
+    <div class="lfilt" id="wny-lf-county">
+      <button class="lf on" onclick="wnyListFilter('county','All',this)">All Counties</button>
+      <button class="lf" onclick="wnyListFilter('county','Chautauqua',this)">Chautauqua</button>
+      <button class="lf" onclick="wnyListFilter('county','Cattaraugus',this)">Cattaraugus</button>
+      <button class="lf" onclick="wnyListFilter('county','Erie NY',this)">Erie NY</button>
+    </div>
+    <div class="lfilt" id="wny-lf-type">
+      <button class="lf on" onclick="wnyListFilter('type','All',this)">All Types</button>
+      <button class="lf" onclick="wnyListFilter('type','Thrift',this)">Thrift</button>
+      <button class="lf" onclick="wnyListFilter('type','Antique',this)">Antique</button>
+      <button class="lf" onclick="wnyListFilter('type','Consignment',this)">Consignment</button>
+      <button class="lf" onclick="wnyListFilter('type','Vintage',this)">Vintage</button>
+    </div>
+    <div class="lcnt" id="wny-lcnt"></div>
+  </div>
+  <table class="tbl" id="wny-tbl">
+    <thead><tr><th>Store</th><th>County</th><th>Type</th><th>Address</th><th>Phone</th><th>Hours</th></tr></thead>
+    <tbody id="wny-tbody"></tbody>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <!-- EDIT: Footer text -->
+  <p><strong>NW Pennsylvania &amp; Western NY Thrift Directory</strong> &nbsp;|&nbsp; Compiled March 2026 &nbsp;|&nbsp; Hours and store status subject to change. Always call ahead.</p>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// STORE DATA
+// Edit stores here. Each object: n=name, c=county, t=type,
+// a=address, ph=phone, h=hours, lat=latitude, lng=longitude
+// To add: copy a line, update all fields, add comma at end
+// To remove: delete the whole line including trailing comma
+// ════════════════════════════════════════════════════════════
+
+const PA_STORES=[
+  // ERIE COUNTY PA
+  {n:"AMVETS Erie",c:"Erie",t:"Thrift",a:"3424 Liberty St, Erie, PA",ph:"TBD",h:"Call ahead to verify",lat:42.1124,lng:-80.0853},
+  {n:"Cobb's Second Time Around",c:"Erie",t:"Thrift",a:"1215 Parade St, Erie, PA",ph:"(814) 455-4068",h:"Mon–Sat 10a–6p; Sun closed",lat:42.1218,lng:-80.0778},
+  {n:"Erie City Mission (French St)",c:"Erie",t:"Thrift",a:"1017 French St, Erie, PA",ph:"TBD",h:"Call ahead to verify",lat:42.1292,lng:-80.0849},
+  {n:"Finders Keepers of Erie",c:"Erie",t:"Thrift",a:"1250 Brown Ave, Erie, PA",ph:"(582) 228-2189",h:"Mon–Wed 10a–6p; Thu–Fri 11a–6p; Sat 11a–5p; Sun closed",lat:42.1115,lng:-80.1091},
+  {n:"Green Scene Thrift",c:"Erie",t:"Thrift",a:"1301 E Grandview Blvd, Erie, PA",ph:"TBD",h:"Tue & Thu 11a–6p only",lat:42.1012,lng:-80.0618},
+  {n:"Mel & Tee's Secondhand & Estate",c:"Erie",t:"Thrift",a:"4915 Hillsdale Ave, Erie, PA",ph:"(814) 881-7724",h:"Call ahead to verify",lat:42.0911,lng:-80.1398},
+  {n:"Rainbow Connection Thrift (EUMA)",c:"Erie",t:"Thrift",a:"1516 Buffalo Rd, Erie, PA",ph:"(814) 453-4080",h:"Mon–Thu 11a–3p; Fri–Sun closed",lat:42.1004,lng:-80.0642},
+  {n:"Salvation Army — Keystone Dr",c:"Erie",t:"Thrift",a:"1944 Keystone Dr, Erie, PA",ph:"(814) 866-1787",h:"Mon–Sat (call ahead); Sun closed",lat:42.0709,lng:-80.0359},
+  {n:"Salvation Army — Sassafras St",c:"Erie",t:"Thrift",a:"1209 Sassafras St, Erie, PA",ph:"TBD",h:"Call ahead to verify",lat:42.1281,lng:-80.0862},
+  {n:"814 Vintage Marketplace",c:"Erie",t:"Vintage",a:"2105 Hershey Rd, Erie, PA",ph:"(814) 520-5133",h:"Tue–Sun 11a–5p; Mon closed — 8,000 sq ft multi-vendor vintage/antique co-op",lat:42.0720,lng:-80.0297},
+  {n:"Thrifter Heaven",c:"Erie",t:"Thrift",a:"4455 W Ridge Rd, Erie, PA",ph:"TBD",h:"Call ahead to verify",lat:42.0889,lng:-80.1647},
+  {n:"Erie Habitat for Humanity ReStore",c:"Erie",t:"Thrift",a:"1728 E 12th St, Erie, PA",ph:"(814) 452-1393",h:"Call ahead to verify",lat:42.1148,lng:-79.9921},
+  {n:"SHE Vintage",c:"Erie",t:"Vintage",a:"419 State St, Erie, PA",ph:"(814) 566-5365",h:"Thu–Sat 10a–3p",lat:42.1297,lng:-80.0855},
+  {n:"Presque Isle Consignment",c:"Erie",t:"Consignment",a:"2208 W 8th St, Erie, PA",ph:"(814) 520-8055",h:"Call ahead to verify — upscale furniture, home decor & jewelry consignment",lat:42.1099,lng:-80.1251},
+  {n:"Antiques by Walker House",c:"Erie",t:"Antique",a:"1945 W 26th St, Erie, PA",ph:"(814) 459-0880",h:"Tue–Fri 10a–4p; Sat 10a–5p; Sun 12p–4p; Mon closed",lat:42.0903,lng:-80.1101},
+  {n:"Copper Carriage",c:"Erie",t:"Antique",a:"406 State St, Erie, PA",ph:"(814) 914-8831",h:"Thu–Fri 11a–4p; Sat 10a–5p; Sun 11a–3p; Mon–Wed closed — voted Erie's Best Antique Store 2024 & 2025",lat:42.1294,lng:-80.0852},
+  {n:"Oregon Antique Boutique",c:"Erie",t:"Antique",a:"3436 W Lake Rd, Erie, PA",ph:"(814) 836-0737",h:"Mon–Fri 11a–4p; Sat 10a–4p; Sun 12p–3p",lat:42.0945,lng:-80.1552},
+  {n:"Presque Isle Militaria & Antiques",c:"Erie",t:"Antique",a:"811 W 26th St, Erie, PA",ph:"(814) 504-7532",h:"Thu–Sun 11a–5p; Mon–Wed closed",lat:42.0895,lng:-80.0974},
+  {n:"Goodwill — Harborcreek",c:"Erie",t:"Thrift",a:"4270 E Lake Rd, Erie, PA",ph:"(440) 812-7018",h:"Mon–Sun 10a–6p",lat:42.1214,lng:-79.9789},
+  {n:"Goodwill — Summit Town Center",c:"Erie",t:"Thrift",a:"7200 Peach St, Erie, PA",ph:"(814) 866-4762",h:"Mon–Sat 9a–7p; Sun 10a–6p",lat:42.0611,lng:-80.0367},
+  {n:"Adeline's Attic",c:"Erie",t:"Thrift",a:"108 High St, Waterford, PA",ph:"TBD",h:"Call ahead to verify",lat:41.9420,lng:-79.9776},
+  {n:"Erie Bargains & Craftfusion",c:"Erie",t:"Thrift",a:"11 Clinton St, North East, PA",ph:"TBD",h:"Wed 10a–8p; Thu–Sun 10a–3p",lat:42.2178,lng:-79.8330},
+  {n:"re.FOUND.ry",c:"Erie",t:"Antique",a:"14 S Lake St, North East, PA",ph:"TBD",h:"Call ahead to verify — multi-vendor",lat:42.2163,lng:-79.8317},
+  {n:"The North Easterner Boutique",c:"Erie",t:"Consignment",a:"109 S Lake St, North East, PA",ph:"TBD",h:"Call ahead to verify",lat:42.2158,lng:-79.8321},
+  {n:"Treva's Trinkets & Treasures",c:"Erie",t:"Thrift",a:"77 S Pearl St, North East, PA",ph:"TBD",h:"Call ahead to verify",lat:42.2171,lng:-79.8339},
+  {n:"4 N.I.N.E. Thrift Store",c:"Erie",t:"Thrift",a:"49 Smedley St, North East, PA",ph:"(814) 725-9804",h:"Mon 12p–4p; Wed 12p–4p; Sat 10a–2p — cash & checks only; all-volunteer 501(c)3; 30+ years",lat:42.2181,lng:-79.8352},
+  {n:"Lady Gray Antiques",c:"Erie",t:"Antique",a:"114 Erie St, Edinboro, PA",ph:"(814) 734-8060",h:"Tue–Fri 10a–5p; Sat 10a–4p; Mon & Sun closed",lat:41.8740,lng:-80.1329},
+  {n:"Lake Effects Antiques",c:"Erie",t:"Antique",a:"131 Erie St, Edinboro, PA",ph:"(814) 734-4610",h:"Call ahead to verify",lat:41.8742,lng:-80.1326},
+  {n:"Taylor Antique Mall",c:"Erie",t:"Antique",a:"220 W Plum St, Edinboro, PA",ph:"(814) 853-3580",h:"Tue–Sat 10a–6p; Sun 10a–5p; Mon closed",lat:41.8752,lng:-80.1345},
+  {n:"Thrifty Threads",c:"Erie",t:"Thrift",a:"128 Sunset Dr, Edinboro, PA",ph:"(814) 734-5268",h:"Call ahead to verify",lat:41.8722,lng:-80.1311},
+  {n:"Erie City Mission Thrifty Shopper",c:"Erie",t:"Thrift",a:"10081 Ridge Rd, Girard, PA",ph:"(814) 402-1154",h:"Mon–Fri 9a–5p; Sat 9a–4p; Sun closed",lat:41.8918,lng:-80.3247},
+  {n:"Heartland Antiques & Gifts",c:"Erie",t:"Antique",a:"9101 Ridge Rd, Girard, PA",ph:"(814) 774-0344",h:"Mon–Fri 10a–5p; Sat–Sun 10a–3p",lat:41.9001,lng:-80.3172},
+  {n:"Second Time Around Thrift",c:"Erie",t:"Thrift",a:"2166 Rice Ave, Lake City, PA",ph:"TBD",h:"Call ahead to verify",lat:41.9813,lng:-80.3423},
+  {n:"One-Eighty Consignment & Thrift",c:"Erie",t:"Thrift",a:"10 E State St, Albion, PA",ph:"TBD",h:"Call ahead to verify",lat:41.8893,lng:-80.3652},
+  {n:"Union City Flea Market",c:"Erie",t:"Thrift",a:"76 Waterford St, Union City, PA",ph:"(814) 438-8280",h:"Thu–Sun 10a–4p; Mon–Wed closed",lat:41.8979,lng:-79.8430},
+  {n:"Connie's Closet",c:"Erie",t:"Thrift",a:"37 N Center St, Corry, PA",ph:"(814) 664-8127",h:"Call ahead to verify",lat:41.9288,lng:-79.6449},
+  {n:"His Helping Hands",c:"Erie",t:"Thrift",a:"127 N Center St, Corry, PA",ph:"(814) 664-9318",h:"Call ahead to verify",lat:41.9295,lng:-79.6451},
+  {n:"Store 104",c:"Erie",t:"Thrift",a:"104 W Main St, Corry, PA",ph:"(814) 664-4747",h:"Call ahead to verify",lat:41.9275,lng:-79.6467},
+  {n:"Village Thrift Shop",c:"Erie",t:"Thrift",a:"51 N Center St, Corry, PA",ph:"(814) 664-4365",h:"Thu–Sat 11a–4p",lat:41.9284,lng:-79.6448},
+  {n:"Whistle Stop Antique Mall",c:"Erie",t:"Antique",a:"50 N Center St, Corry, PA",ph:"(814) 663-7867",h:"Wed–Sun 10a–5p; Mon–Tue closed",lat:42.0000,lng:-79.6446},
+  {n:"Vintage 42",c:"Erie",t:"Vintage",a:"Corry, PA",ph:"TBD",h:"Call ahead to verify",lat:41.9280,lng:-79.6443},
+  // CRAWFORD COUNTY
+  {n:"Hermitage House Thrift",c:"Crawford",t:"Thrift",a:"233 S Main St, Cambridge Springs, PA",ph:"(814) 734-4951",h:"Call ahead to verify",lat:41.7998,lng:-80.0603},
+  {n:"Walker's Buttons & Bows",c:"Crawford",t:"Consignment",a:"152 Venango Ave, Cambridge Springs, PA",ph:"(814) 398-8510",h:"Mon–Fri 10a–5:30p; Sat 10a–5p; Sun 1p–4p",lat:41.8010,lng:-80.0619},
+  {n:"Samaritans / Holy Ground Thrift",c:"Crawford",t:"Thrift",a:"155 S 9th St, Conneaut Lake, PA",ph:"(814) 382-4487",h:"Mon 9a–12p & 5:30–7:30p; Thu 9a–6p",lat:41.6312,lng:-80.3098},
+  {n:"Olde Acquaintances Consignment",c:"Crawford",t:"Consignment",a:"Conneaut Lake, PA",ph:"TBD",h:"Call ahead to verify — furniture & home decor consignment",lat:41.6320,lng:-80.3085},
+  {n:"Humphrey's Closet",c:"Crawford",t:"Thrift",a:"1000 Main St, Conneautville, PA",ph:"(814) 587-6001",h:"Call ahead to verify",lat:41.7577,lng:-80.3673},
+  {n:"Finders Keepers Thrift Shop",c:"Crawford",t:"Thrift",a:"325 W Erie St, Linesville, PA",ph:"(814) 573-8230",h:"Wed–Fri 10a–6p; Sat 9a–6p; Sun 12p–5p",lat:41.6563,lng:-80.4292},
+  {n:"Tim's Man Shop",c:"Crawford",t:"Thrift",a:"160 W Erie St, Linesville, PA",ph:"(814) 683-1029",h:"Call ahead to verify",lat:41.6559,lng:-80.4285},
+  {n:"Crawford Co. Humane Society Thrift",c:"Crawford",t:"Thrift",a:"904 Park Ave, Meadville, PA",ph:"(814) 337-6880",h:"Mon–Sat 9a–5p; Sun closed",lat:41.6502,lng:-80.1491},
+  {n:"G's Thrift Shop",c:"Crawford",t:"Thrift",a:"11173 Perry Hwy, Meadville, PA",ph:"(814) 333-9744",h:"Call ahead to verify",lat:41.6887,lng:-80.1443},
+  {n:"Hippie Chick",c:"Crawford",t:"Thrift",a:"16224 Conneaut Lake Rd, Meadville, PA",ph:"(814) 807-1130",h:"Call ahead to verify",lat:41.6348,lng:-80.2182},
+  {n:"Ooh Lala Consignment Boutique",c:"Crawford",t:"Consignment",a:"900 Water St, Meadville, PA",ph:"(814) 724-1082",h:"Mon 10a–6p; Tue 10a–4p; Wed closed; Thu–Sun 10a–6p",lat:41.6412,lng:-80.1492},
+  {n:"The Lighthouse Thrift Shop",c:"Crawford",t:"Thrift",a:"660 Terrace St, Meadville, PA",ph:"(814) 333-6788",h:"Call ahead to verify",lat:41.6444,lng:-80.1531},
+  {n:"Salvation Army — Meadville",c:"Crawford",t:"Thrift",a:"11129 Cotton Rd, Meadville, PA",ph:"(814) 724-2336",h:"Mon–Sat 9a–7p; Sun closed",lat:41.6901,lng:-80.1522},
+  {n:"Tiny's Treasure Chest",c:"Crawford",t:"Antique",a:"15705 Conneaut Lake Rd, Meadville, PA",ph:"(814) 807-0818",h:"Thu–Sat 10a–6p; Sun 11a–4p; Mon–Wed closed",lat:41.6371,lng:-80.2079},
+  {n:"Top Drawer",c:"Crawford",t:"Consignment",a:"776 N Main St, Meadville, PA",ph:"(814) 333-9737",h:"Call ahead to verify",lat:41.6561,lng:-80.1517},
+  {n:"Troyer Antiques",c:"Crawford",t:"Antique",a:"15420 Baldwin Street Ext, Meadville, PA",ph:"(814) 724-4036",h:"Call ahead to verify — multi-building antique farm",lat:41.6789,lng:-80.1211},
+  {n:"Trolley Antiques",c:"Crawford",t:"Antique",a:"440 Baldwin St, Meadville, PA",ph:"(814) 720-0025",h:"Thu–Sun 10a–5p — antiques in historic 1928 trolley car building",lat:41.6428,lng:-80.1478},
+  {n:"Generations Thrift",c:"Crawford",t:"Thrift",a:"15650 Conneaut Lake Rd, Meadville, PA",ph:"(814) 813-2103",h:"Tue–Fri 9a–6p; Sat 9a–4p — opened Nov 2024; 20,000 sq ft; benefits Faith Builders Christian School",lat:41.6380,lng:-80.2190},
+  {n:"Center for Family Services Thrift",c:"Crawford",t:"Thrift",a:"213 W Center St, Meadville, PA",ph:"(814) 337-8450",h:"Call ahead to verify — United Way partner agency",lat:41.6431,lng:-80.1509},
+  {n:"French Creek Antiques",c:"Crawford",t:"Antique",a:"201 Main St, Saegertown, PA",ph:"(814) 783-0106",h:"Tue 9a–3p; Wed–Sat 9:30a–4:30p; Sun 9a–3p; Mon closed — voted Top Antique Store Crawford County",lat:41.7168,lng:-80.1478},
+  {n:"Richie's Thriftys",c:"Crawford",t:"Thrift",a:"440 Main St, Saegertown, PA",ph:"(814) 783-0104",h:"Call ahead to verify",lat:41.7162,lng:-80.1471},
+  {n:"Carpenters Corner Antiques",c:"Crawford",t:"Antique",a:"101 S Franklin St, Titusville, PA",ph:"(814) 775-0263",h:"Mon–Sat (call ahead) — historic 1849 building",lat:41.6270,lng:-79.6730},
+  {n:"Goodwill — Titusville",c:"Crawford",t:"Thrift",a:"115 Diamond St, Titusville, PA",ph:"(814) 775-0037",h:"Mon–Sat 10a–7p; Sun 10a–6p",lat:41.6263,lng:-79.6742},
+  {n:"Landmark Square",c:"Crawford",t:"Antique",a:"601 W Spring St, Titusville, PA",ph:"(814) 827-0863",h:"Call ahead to verify — antiques, estate sales & appraisals; est. 2007",lat:41.6278,lng:-79.6812},
+  {n:"Bringing It Back",c:"Crawford",t:"Antique",a:"Titusville, PA",ph:"TBD",h:"Call ahead to verify — upcycling, repurposing, antique & barn finds",lat:41.6268,lng:-79.6748},
+  {n:"Mostly Treasure",c:"Crawford",t:"Thrift",a:"33466 E Freemont St, Townville, PA",ph:"(814) 967-2121",h:"Call ahead to verify",lat:41.6843,lng:-79.8221},
+  // VENANGO COUNTY
+  {n:"Goodwill — Cranberry",c:"Venango",t:"Thrift",a:"17 Kimberly Ln, Cranberry, PA",ph:"(814) 678-8645",h:"Call ahead to verify",lat:41.3498,lng:-79.9852},
+  {n:"Red Cannon Country Antiques",c:"Venango",t:"Antique",a:"630 Peg-A-Nal Rd, Cranberry, PA",ph:"(814) 498-2704",h:"Mon–Wed 11a–4p; Thu–Sat 11a–6p; Sun 11a–4p",lat:41.3521,lng:-79.9779},
+  {n:"Antique Annie's",c:"Venango",t:"Antique",a:"1242 Liberty St, Franklin, PA",ph:"(814) 518-7011",h:"Mon–Thu 10a–6p; Fri 10a–7:30p; Sat 10a–6p; Sun 12p–4p",lat:41.3981,lng:-79.8312},
+  {n:"Franklin Antique Mall & Auction",c:"Venango",t:"Antique",a:"1280 Franklin Ave, Franklin, PA",ph:"(814) 432-8577",h:"Call ahead to verify — 60+ dealers",lat:41.4021,lng:-79.8297},
+  {n:"Good Shepard Shoppe",c:"Venango",t:"Thrift",a:"619 13th St, Franklin, PA",ph:"(814) 437-1580",h:"Mon–Fri 8a–5p; Sat–Sun closed",lat:41.3941,lng:-79.8358},
+  {n:"Goodwill — Franklin",c:"Venango",t:"Thrift",a:"767 Allegheny Blvd, Franklin, PA",ph:"(814) 432-8711",h:"Call ahead to verify",lat:41.4132,lng:-79.8421},
+  {n:"Liberty Street Antiques",c:"Venango",t:"Antique",a:"1239 Liberty St, Franklin, PA",ph:"(814) 437-6550",h:"Tue–Sat 10a–5p; Sun 1p–5p; Mon closed",lat:41.3978,lng:-79.8316},
+  {n:"The Galleria at Olde Liberty",c:"Venango",t:"Antique",a:"1252 Liberty St, Franklin, PA",ph:"(814) 518-5504",h:"Call ahead to verify — artisan & vendor shop; antiques, vintage, jewelry",lat:41.3975,lng:-79.8319},
+  {n:"Salvation Army — Franklin",c:"Venango",t:"Thrift",a:"316 Allegheny Blvd, Franklin, PA",ph:"(814) 432-4649",h:"Mon–Sat 9a–8p; call ahead to verify",lat:41.4078,lng:-79.8398},
+  {n:"Venango Co. Humane Society Thrift",c:"Venango",t:"Thrift",a:"744 Liberty St, Franklin, PA",ph:"(814) 437-1700",h:"Mon–Sat 10a–4p; Sun closed",lat:41.3969,lng:-79.8303},
+  {n:"Goodwill — Oil City",c:"Venango",t:"Thrift",a:"400 E 2nd St, Oil City, PA",ph:"(814) 670-0729",h:"Mon–Sat 10a–7p; Sun 12p–5p",lat:41.4331,lng:-79.7031},
+  {n:"J & J's Corner Cupboard",c:"Venango",t:"Antique",a:"114 Center St, Oil City, PA",ph:"(814) 676-8525",h:"Call ahead to verify",lat:41.4312,lng:-79.7058},
+  {n:"Oil City Warehouse Mall",c:"Venango",t:"Antique",a:"30 Pumphouse Rd, Oil City, PA",ph:"(814) 678-2200",h:"Mon–Thu 10a–5p; Fri 10a–7p; Sat 10a–5p; Sun 12p–5p — 34,000 sq ft warehouse",lat:41.4289,lng:-79.7112},
+  {n:"Scrappy Joe's Second Hand LLC",c:"Venango",t:"Thrift",a:"4149 PA-257, Oil City, PA",ph:"(814) 688-8035",h:"Tue–Sat 10a–5p; Sun 10a–3p; Mon closed — 70+ vendors",lat:41.4521,lng:-79.7288},
+  {n:"The Attic",c:"Venango",t:"Antique",a:"407 E 2nd St, Oil City, PA",ph:"(814) 677-3700",h:"Mon–Fri 10a–5p; Sat 12p–5p; Sun closed",lat:41.4328,lng:-79.7028},
+  {n:"Goodwill — Seneca",c:"Venango",t:"Thrift",a:"3052 State Route 257, Seneca, PA",ph:"(814) 676-0787",h:"Call ahead to verify",lat:41.3812,lng:-79.7189},
+];
+
+const WNY_STORES=[
+  {n:"Ron's Treasures",c:"Chautauqua",t:"Antique",a:"88 N Main St, Cassadaga, NY 14718",ph:"(716) 595-2555",h:"Wed–Sat (call ahead) — antiques in renovated church; furniture, tools, collectibles; 2–3 buildings of inventory",lat:42.3412,lng:-79.3298},
+  {n:"AMVETS Thrift — Dunkirk",c:"Chautauqua",t:"Thrift",a:"29 Lake Shore Dr W, Dunkirk, NY 14048",ph:"(716) 366-7580",h:"Call ahead to verify",lat:42.4793,lng:-79.3359},
+  {n:"Salvation Army — Dunkirk",c:"Chautauqua",t:"Thrift",a:"29 Lake Shore Dr, Dunkirk, NY 14048",ph:"(716) 366-3700",h:"Call ahead to verify",lat:42.4791,lng:-79.3362},
+  {n:"St. Vincent de Paul — Dunkirk",c:"Chautauqua",t:"Thrift",a:"117 Osborne St, Dunkirk, NY 14048",ph:"(716) 366-7730",h:"Call ahead to verify",lat:42.4801,lng:-79.3341},
+  {n:"Attic to Basement Repeats — Dunkirk",c:"Chautauqua",t:"Thrift",a:"Dunkirk, NY 14048",ph:"(716) 366-9309",h:"Call ahead to verify — furniture, housewares, collectibles",lat:42.4788,lng:-79.3355},
+  {n:"Thrifty Kitty — Westfield",c:"Chautauqua",t:"Thrift",a:"59 E Main St, Westfield, NY 14787",ph:"(716) 326-2404",h:"Call ahead to verify — benefits cat rescue; odds and ends, household goods",lat:42.3239,lng:-79.5779},
+  {n:"Treasure Chest Antiques",c:"Chautauqua",t:"Antique",a:"Fredonia, NY 14063",ph:"(716) 672-2386",h:"Call ahead to verify — multi-vendor antiques",lat:42.4401,lng:-79.3312},
+  {n:"Chautauqua Rare Books & Antiques",c:"Chautauqua",t:"Antique",a:"Fredonia, NY 14063",ph:"(716) 672-8988",h:"Call ahead to verify — rare books, antiques",lat:42.4398,lng:-79.3308},
+  {n:"Brocton Arch Antiques",c:"Chautauqua",t:"Antique",a:"Brocton, NY 14716",ph:"(716) 792-4635",h:"Call ahead to verify",lat:42.3889,lng:-79.4398},
+  {n:"Silver Fox Hidden Treasure",c:"Chautauqua",t:"Thrift",a:"Silver Creek / Angola area, NY",ph:"TBD",h:"Call ahead to verify — consistently appears in top thrift lists for this area",lat:42.5521,lng:-79.0312},
+  {n:"Salvation Army — Jamestown",c:"Chautauqua",t:"Thrift",a:"585 Fairmount Ave, Jamestown, NY 14701",ph:"(800) 728-7825",h:"Mon–Sat 10a–7p; Sun closed",lat:42.0879,lng:-79.2441},
+  {n:"Goodwill — Jamestown",c:"Chautauqua",t:"Thrift",a:"707 Fairmount Ave, Jamestown, NY 14701",ph:"(716) 664-4504",h:"Call ahead to verify",lat:42.0882,lng:-79.2448},
+  {n:"2nd Chances Humane Society Thrift",c:"Chautauqua",t:"Thrift",a:"409 Pine St, Jamestown, NY 14701",ph:"(716) 664-1887",h:"Call ahead to verify — benefits Chautauqua County Humane Society",lat:42.0812,lng:-79.2361},
+  {n:"Community Helping Hands Depot Thrift",c:"Chautauqua",t:"Thrift",a:"31 Water St, Jamestown, NY 14701",ph:"(716) 487-1488",h:"Wed–Fri 3p–7p — furniture showroom & depot thrift; household items & furniture",lat:42.0968,lng:-79.2401},
+  {n:"Peddler's Market — Jamestown",c:"Chautauqua",t:"Thrift",a:"Jamestown, NY 14701",ph:"(716) 720-0143",h:"Call ahead to verify — multi-vendor indoor market",lat:42.0901,lng:-79.2378},
+  {n:"Ali Baba Antiques & Appraisals",c:"Chautauqua",t:"Antique",a:"343 E Fairmount Ave, Lakewood, NY 14750",ph:"(716) 763-1111",h:"Call ahead to verify",lat:42.1002,lng:-79.3221},
+  {n:"St. Luke's Thrift Shop",c:"Chautauqua",t:"Thrift",a:"Jamestown, NY 14701",ph:"TBD",h:"Call ahead to verify — outreach ministry of St. Luke's Episcopal Church; supports Jamestown community",lat:42.0895,lng:-79.2389},
+  {n:"Tiquehunter Antiques",c:"Chautauqua",t:"Antique",a:"Lakewood, NY 14750",ph:"(716) 712-5313",h:"Call ahead to verify",lat:42.1012,lng:-79.3198},
+  {n:"VSK Emporium",c:"Chautauqua",t:"Antique",a:"54 W Main St, Lakewood, NY 14750",ph:"(716) 569-6547",h:"Call ahead to verify — multi-category resale, antiques, oddities",lat:42.1008,lng:-79.3211},
+  {n:"Lakeside Antiques",c:"Chautauqua",t:"Antique",a:"Lakewood, NY 14750",ph:"TBD",h:"Call ahead to verify — antiques near Chautauqua Lake",lat:42.1015,lng:-79.3205},
+  {n:"The Pirate's Cove Antiques & Collectibles",c:"Chautauqua",t:"Antique",a:"7 Water St, Mayville, NY 14757",ph:"(716) 753-2525",h:"Call ahead to verify",lat:42.2501,lng:-79.5042},
+  {n:"2 Lakes Antiques",c:"Chautauqua",t:"Antique",a:"Mayville, NY 14757",ph:"(716) 753-2744",h:"Call ahead to verify",lat:42.2498,lng:-79.5038},
+  {n:"Uptown Dresser",c:"Chautauqua",t:"Consignment",a:"36 S Erie St, Mayville, NY 14757",ph:"(716) 753-2116",h:"Call ahead to verify — home goods & general consignment",lat:42.2503,lng:-79.5031},
+  {n:"Landmark Acres Antiques",c:"Chautauqua",t:"Antique",a:"4743 E Main Rd (Rt 20), Westfield, NY 14787",ph:"(716) 326-2117",h:"Call ahead to verify — est. 1946; one of WNY's oldest & largest fine antique shops",lat:42.3245,lng:-79.5391},
+  {n:"Beboppin Antiques",c:"Chautauqua",t:"Antique",a:"Westfield, NY 14787",ph:"(716) 326-6669",h:"Call ahead to verify",lat:42.3241,lng:-79.5782},
+  {n:"Antiques By The Lake",c:"Chautauqua",t:"Antique",a:"Sherman, NY 14781",ph:"(716) 326-7966",h:"Call ahead to verify",lat:42.2031,lng:-79.5881},
+  {n:"The Bridge Thrift Store",c:"Cattaraugus",t:"Thrift",a:"Allegany, NY 14706",ph:"TBD",h:"Call ahead to verify — non-profit thrift & food pantry; run by St. Bonaventure Parish; serves Allegany/Olean community",lat:42.0948,lng:-78.5011},
+  {n:"Betsy's Consignments",c:"Cattaraugus",t:"Consignment",a:"Ellicottville, NY 14731",ph:"TBD",h:"Call ahead to verify — home goods, furniture, collectibles; popular with ski season visitors",lat:42.2748,lng:-78.6731},
+  {n:"The Purple Doorknob",c:"Cattaraugus",t:"Consignment",a:"Ellicottville, NY 14731",ph:"TBD",h:"Call ahead to verify — general thrift and household goods",lat:42.2751,lng:-78.6734},
+  {n:"Goodwill — Olean",c:"Cattaraugus",t:"Thrift",a:"Olean, NY 14760",ph:"(716) 372-0892",h:"Call ahead to verify — one of the most highly rated Goodwill locations in WNY",lat:42.0812,lng:-78.4291},
+  {n:"Salvation Army — Olean",c:"Cattaraugus",t:"Thrift",a:"502 N Union St, Olean, NY 14760",ph:"(716) 372-0330",h:"Call ahead to verify",lat:42.0798,lng:-78.4312},
+  {n:"St. Vincent de Paul — Olean",c:"Cattaraugus",t:"Thrift",a:"441 N Union St, Olean, NY 14760",ph:"(716) 372-7610",h:"Mon–Fri 10a–2:45p; Sat–Sun closed — also food pantry & financial assistance",lat:42.0801,lng:-78.4308},
+  {n:"A Second Thought Resale Shop",c:"Cattaraugus",t:"Thrift",a:"Olean, NY 14760",ph:"TBD",h:"Call ahead to verify — general resale, household goods",lat:42.0821,lng:-78.4278},
+  {n:"Olean Lumberyard Antiques",c:"Cattaraugus",t:"Antique",a:"Olean, NY 14760",ph:"TBD",h:"Call ahead to verify — antiques in former lumberyard",lat:42.0789,lng:-78.4321},
+  {n:"Trinity Helping Hands",c:"Cattaraugus",t:"Thrift",a:"131 N 9th St, Olean, NY 14760",ph:"TBD",h:"Call ahead to verify — opened 2025; Trinity United Methodist Church thrift store",lat:42.0809,lng:-78.4289},
+  {n:"Country Gentleman Antiques",c:"Cattaraugus",t:"Antique",a:"Olean, NY 14760",ph:"TBD",h:"Call ahead — appointment available; 1,778 Facebook likes; quality antiques",lat:42.0831,lng:-78.4271},
+  {n:"Yours, Mine & Ours Resale Shop",c:"Cattaraugus",t:"Thrift",a:"Olean, NY 14760",ph:"TBD",h:"Call ahead to verify",lat:42.0818,lng:-78.4301},
+  {n:"Salamanca Mall Antiques",c:"Cattaraugus",t:"Antique",a:"166 Main St, Salamanca, NY 14779",ph:"(716) 945-1800",h:"Mon–Sun 10a–5p — one of NY's largest antique malls; 30,000+ sq ft; 1,000+ dealers; 1 million+ items",lat:42.1578,lng:-78.7148},
+  {n:"Cuba Antiques",c:"Cattaraugus",t:"Antique",a:"Cuba, NY 14727",ph:"TBD",h:"Call ahead to verify",lat:42.2178,lng:-78.2748},
+  {n:"Junk and Disorderly Arts & Antiques",c:"Cattaraugus",t:"Antique",a:"Cattaraugus County, NY",ph:"TBD",h:"Call ahead to verify — art and antique shop",lat:42.2001,lng:-78.5501},
+  {n:"Solomon's Hidden Treasures",c:"Cattaraugus",t:"Thrift",a:"Cattaraugus County, NY",ph:"TBD",h:"Call ahead to verify — general merchandise, household goods",lat:42.1901,lng:-78.5481},
+  {n:"Back In Tyme Antiques",c:"Cattaraugus",t:"Antique",a:"Cattaraugus County, NY",ph:"TBD",h:"Call ahead to verify",lat:42.2101,lng:-78.5521},
+  {n:"The Old Chapel Antique & Artisan Market",c:"Erie NY",t:"Antique",a:"172 Robinson St, North Tonawanda, NY 14120",ph:"(716) 545-6102",h:"Mon–Sun 10a–6p — 6,500+ sq ft in historic 1894 church; 130+ vendors; antiques, gifts, decor, vinyl records; cafe on-site",lat:43.0378,lng:-78.8641},
+  {n:"The Old Greenhouse Antiques & Decor",c:"Erie NY",t:"Antique",a:"700 E Robinson Rd, North Tonawanda, NY 14120",ph:"TBD",h:"Mon–Sun 10a–6p — sister shop to Old Chapel; antiques & home decor",lat:43.0381,lng:-78.8638},
+  {n:"Tattered Tulip — North Tonawanda",c:"Erie NY",t:"Antique",a:"908 Niagara Falls Blvd, North Tonawanda, NY 14120",ph:"(716) 957-3400",h:"Call ahead to verify — vintage and new home goods; rustic/farmhouse aesthetic",lat:43.0521,lng:-78.8798},
+  {n:"Shawnee Country Barns Antique Co-Op",c:"Erie NY",t:"Antique",a:"North Tonawanda, NY 14120",ph:"TBD",h:"Call ahead to verify — multi-vendor antique co-op",lat:43.0389,lng:-78.8712},
+  {n:"Tattered Tulip — Lockport",c:"Erie NY",t:"Antique",a:"4090 Lake Ave, Lockport, NY 14094",ph:"(716) 438-5257",h:"Mon–Sat 10a–5p; Sun 11a–5p — vintage & new home goods, furniture; second location of Tattered Tulip",lat:43.1698,lng:-78.6901},
+  {n:"I Thrift — Lockport",c:"Erie NY",t:"Consignment",a:"Lockport, NY 14094",ph:"TBD",h:"Call ahead to verify — clothing, furniture, collectibles; spacious shop",lat:43.1701,lng:-78.6891},
+  {n:"Goodwill — Lockport",c:"Erie NY",t:"Thrift",a:"Lockport, NY 14094",ph:"TBD",h:"Call ahead to verify",lat:43.1688,lng:-78.6921},
+  {n:"St. Vincent de Paul — Lockport",c:"Erie NY",t:"Thrift",a:"Lockport, NY 14094",ph:"TBD",h:"Call ahead to verify",lat:43.1712,lng:-78.6878},
+  {n:"The Checkered Poppy Antiques & Gifts",c:"Erie NY",t:"Antique",a:"Lockport, NY 14094",ph:"TBD",h:"Call ahead to verify — vendor gift & antique co-op; 2,685 Facebook likes; seasonal hours",lat:43.1721,lng:-78.6868},
+  {n:"Jay Bird Antiques",c:"Erie NY",t:"Antique",a:"Lockport, NY 14094",ph:"TBD",h:"Call ahead to verify — eclectic antiques at historic Forsyth Tavern",lat:43.1695,lng:-78.6911},
+  {n:"The Lady of the Locks",c:"Erie NY",t:"Vintage",a:"Lockport, NY 14094",ph:"TBD",h:"Call ahead to verify — vintage store; 1,479 Facebook likes",lat:43.1708,lng:-78.6898},
+  {n:"Real Antiques",c:"Erie NY",t:"Antique",a:"Lockport, NY 14094",ph:"TBD",h:"Call ahead to verify — buy/sell local antiques; rotating inventory",lat:43.1715,lng:-78.6882},
+  {n:"Goodwill — Tonawanda (Eggert Rd)",c:"Erie NY",t:"Thrift",a:"3177 Eggert Rd, Tonawanda, NY 14150",ph:"(716) 833-9200",h:"Call ahead to verify — largest of WNY Goodwill locations",lat:42.9901,lng:-78.8721},
+  {n:"Savers — Tonawanda",c:"Erie NY",t:"Thrift",a:"2309 Eggert Rd, Tonawanda, NY 14150",ph:"(716) 833-2391",h:"Call ahead to verify — large for-profit thrift; housewares, furniture, clothing",lat:42.9898,lng:-78.8731},
+  {n:"Attic to Basement Repeats — Tonawanda",c:"Erie NY",t:"Thrift",a:"Tonawanda, NY 14150",ph:"TBD",h:"Call ahead to verify — furniture, housewares, collectibles",lat:42.9889,lng:-78.8741},
+  {n:"Goldie's Thrift Finds",c:"Erie NY",t:"Thrift",a:"Tonawanda, NY 14150",ph:"TBD",h:"Call ahead to verify",lat:42.9912,lng:-78.8711},
+  {n:"Buffalo City Mission Thrift Store",c:"Erie NY",t:"Thrift",a:"100 E Tupper St, Buffalo, NY 14203",ph:"(716) 854-8181",h:"Call ahead to verify — furniture, clothing, housewares, appliances; benefits Buffalo City Mission",lat:42.8901,lng:-78.8712},
+  {n:"St. Vincent de Paul — Buffalo",c:"Erie NY",t:"Thrift",a:"1298 Main St, Buffalo, NY 14209",ph:"(716) 882-3360",h:"Call ahead to verify",lat:42.9012,lng:-78.8621},
+  {n:"Serendipity Shoppe",c:"Erie NY",t:"Thrift",a:"1 Symphony Circle, Buffalo, NY 14201",ph:"(716) 248-0232",h:"Call ahead to verify — home goods, decor, glassware, furniture, art; First Presbyterian Church basement; vinyl records",lat:42.8878,lng:-78.8782},
+  {n:"Gothic City Architectural Antiques",c:"Erie NY",t:"Antique",a:"1940 Niagara St, Buffalo, NY 14207",ph:"(716) 874-4479",h:"Call ahead to verify — est. 1971; 9,000 sq ft showroom + 10,000 sq ft warehouse; mantels, signs, furniture, salvage",lat:42.9178,lng:-78.8978},
+  {n:"Sloan's Antiques",c:"Erie NY",t:"Antique",a:"Buffalo, NY 14216",ph:"(716) 882-6067",h:"Call ahead to verify — est. 1955; furniture, art, jewelry, props, stained glass, architectural salvage",lat:42.9312,lng:-78.8691},
+  {n:"Habitat for Humanity ReStore — North Buffalo",c:"Erie NY",t:"Thrift",a:"501 Amherst St, Buffalo, NY 14207",ph:"(716) 852-6607",h:"Call ahead to verify — building materials, furniture, appliances",lat:42.9189,lng:-78.8921},
+  {n:"Habitat for Humanity ReStore — South Buffalo",c:"Erie NY",t:"Thrift",a:"1675 S Park Ave, Buffalo, NY 14220",ph:"(716) 852-6607",h:"Call ahead to verify — building materials, furniture, appliances",lat:42.8501,lng:-78.8412},
+  {n:"AMVETS Thrift — Delaware Ave Buffalo",c:"Erie NY",t:"Thrift",a:"2671 Delaware Ave, Buffalo, NY 14216",ph:"(716) 877-8090",h:"Call ahead to verify — large selection; highly rated",lat:42.9421,lng:-78.8801},
+  {n:"Buffalo Antiques & Quality Furniture",c:"Erie NY",t:"Antique",a:"1539 Hertel Ave, Buffalo, NY 14216",ph:"(716) 832-0210",h:"Call ahead to verify — 15+ years on Hertel; accessories, furniture, sterling, china",lat:42.9398,lng:-78.8621},
+  {n:"What's In Your Attic?",c:"Erie NY",t:"Antique",a:"Buffalo, NY 14216",ph:"(716) 863-4414",h:"Call ahead to verify — 3 floors of antiques & vintage; consignment booths",lat:42.9401,lng:-78.8631},
+  {n:"Attic to Basement Repeats — North Buffalo",c:"Erie NY",t:"Thrift",a:"Buffalo, NY 14216",ph:"(716) 837-2299",h:"Call ahead to verify — furniture, housewares, collectibles",lat:42.9412,lng:-78.8641},
+  {n:"Salvation Army — Military Rd Buffalo",c:"Erie NY",t:"Thrift",a:"1080 Military Rd, Buffalo, NY 14217",ph:"(716) 874-3154",h:"Call ahead to verify",lat:42.9578,lng:-78.8921},
+  {n:"Hearts Thrift Store",c:"Erie NY",t:"Thrift",a:"890 Tonawanda St, Buffalo, NY 14207",ph:"(716) 882-4327",h:"Call ahead to verify",lat:42.9112,lng:-78.9021},
+  {n:"Peddler's Market — Elmwood",c:"Erie NY",t:"Thrift",a:"656 Elmwood Ave, Buffalo, NY 14222",ph:"(716) 883-6787",h:"Seasonal outdoor flea market — antiques, furniture, jewelry, housewares",lat:42.9001,lng:-78.8821},
+  {n:"Goodwill — Hamburg (McKinley Pkwy)",c:"Erie NY",t:"Thrift",a:"5000 McKinley Pkwy, Hamburg, NY 14219",ph:"TBD",h:"Mon–Sat 9a–8p; Sun 11a–6p",lat:42.7301,lng:-78.8421},
+  {n:"Savers — Hamburg",c:"Erie NY",t:"Thrift",a:"3701 McKinley Pkwy, Hamburg, NY 14219",ph:"(716) 827-6550",h:"Mon–Sat 9a–9p; Sun 10a–7p — large for-profit thrift; housewares, furniture, clothing",lat:42.7289,lng:-78.8431},
+  {n:"Shade Tree Flea & Antiques",c:"Erie NY",t:"Antique",a:"6 S Main St, Angola, NY 14006",ph:"(716) 534-3126",h:"Wed–Sat 12p–5p — furniture, collectibles, antiques; family-owned; delivers to Hamburg area",lat:42.6378,lng:-79.0341},
+  {n:"Port Thrift & Collectibles",c:"Erie NY",t:"Thrift",a:"Angola / Evans area, NY",ph:"TBD",h:"Call ahead to verify",lat:42.6401,lng:-79.0321},
+  {n:"Goodwill — Derby (Erie Rd/Rt 5)",c:"Erie NY",t:"Thrift",a:"Derby, NY 14047",ph:"TBD",h:"Call ahead to verify",lat:42.6912,lng:-79.0021},
+  {n:"Goodwill — West Seneca (Seneca St)",c:"Erie NY",t:"Thrift",a:"3531 Seneca St, West Seneca, NY 14224",ph:"(716) 677-4340",h:"Mon–Sun 10a–7p",lat:42.8378,lng:-78.7991},
+  {n:"Southtowns Rte 219 Antiques",c:"Erie NY",t:"Antique",a:"South Towns, Erie County, NY",ph:"TBD",h:"Call ahead to verify — antiques along Route 219 corridor",lat:42.7401,lng:-78.7821},
+  {n:"Antique World & Flea Market",c:"Erie NY",t:"Antique",a:"11111 Main St, Clarence, NY 14031",ph:"(716) 759-8483",h:"Weekends — WNY's largest antique/flea market; hundreds of indoor & outdoor dealers",lat:43.0012,lng:-78.6091},
+  {n:"Goodwill — Depew (Transit Rd)",c:"Erie NY",t:"Thrift",a:"4779 Transit Rd, Depew, NY 14043",ph:"(716) 656-0930",h:"Call ahead to verify",lat:42.9012,lng:-78.7221},
+  {n:"AMVETS — Depew",c:"Erie NY",t:"Thrift",a:"2900 Walden Ave, Depew, NY 14043",ph:"(716) 684-0210",h:"Call ahead to verify",lat:42.8991,lng:-78.7231},
+  {n:"Goodwill — Williamsville (Maple Rd)",c:"Erie NY",t:"Thrift",a:"Williamsville, NY 14221",ph:"TBD",h:"Call ahead to verify",lat:42.9691,lng:-78.7391},
+  {n:"Goodwill — Williamsville (Transitown)",c:"Erie NY",t:"Thrift",a:"4311 Transit Rd, Williamsville, NY 14221",ph:"(716) 633-5060",h:"Call ahead to verify",lat:42.9681,lng:-78.7401},
+  {n:"Vintage Grace",c:"Erie NY",t:"Antique",a:"2016 Military Rd, Niagara Falls, NY 14304",ph:"(716) 836-7000",h:"Call ahead to verify — Victorian home; 2 floors; 60 consignment showcases",lat:43.0912,lng:-78.9491},
+  {n:"Niagara Heritage Of Hope And Service",c:"Erie NY",t:"Thrift",a:"Niagara Falls, NY 14301",ph:"(716) 284-6260",h:"Call ahead to verify — highly reviewed; housewares, furniture, collectibles",lat:43.0921,lng:-79.0512},
+  {n:"2nd Chance Consignment",c:"Erie NY",t:"Consignment",a:"Niagara Falls, NY 14304",ph:"(716) 205-1011",h:"Call ahead to verify — home goods, furniture, collectibles",lat:43.0901,lng:-79.0491},
+  {n:"Niagara Emporium Antique Mall",c:"Erie NY",t:"Antique",a:"Niagara Falls, NY 14304",ph:"(716) 205-8878",h:"Call ahead to verify — antiques, collectibles, vintage, coins, toys",lat:43.0911,lng:-79.0501},
+  {n:"The White Whale",c:"Erie NY",t:"Vintage",a:"Niagara Falls, NY 14301",ph:"TBD",h:"Call ahead to verify",lat:43.0931,lng:-79.0521},
+  {n:"Salvation Army — Niagara Falls",c:"Erie NY",t:"Thrift",a:"Niagara Falls, NY 14301",ph:"(716) 282-4900",h:"Call ahead to verify",lat:43.0941,lng:-79.0531},
+  {n:"Goodwill — Niagara Falls",c:"Erie NY",t:"Thrift",a:"Niagara Falls, NY 14301",ph:"TBD",h:"Call ahead to verify",lat:43.0951,lng:-79.0541},
+  {n:"The Sanborn Mill Antiques & Collectibles",c:"Erie NY",t:"Antique",a:"Sanborn, NY 14132",ph:"(716) 731-7323",h:"Call ahead to verify — antique mall in historic mill building",lat:43.1401,lng:-78.8891},
+  {n:"Jeddo Mill Antiques",c:"Erie NY",t:"Antique",a:"Niagara County / North Tonawanda area, NY",ph:"TBD",h:"Call ahead to verify — quality antiques, collectibles, primitives",lat:43.0978,lng:-78.8801},
+  {n:"Orchard Park Antique Mall",c:"Erie NY",t:"Antique",a:"Orchard Park, NY 14127",ph:"(716) 662-9731",h:"Call ahead to verify",lat:42.7678,lng:-78.7441},
+  {n:"Goodwill — Orchard Park (SW Blvd)",c:"Erie NY",t:"Thrift",a:"Orchard Park, NY 14127",ph:"TBD",h:"Call ahead to verify",lat:42.7668,lng:-78.7451},
+  {n:"Upstairs Treasures",c:"Erie NY",t:"Antique",a:"East Aurora / Orchard Park area, NY",ph:"TBD",h:"Call ahead to verify — antiques and collectibles",lat:42.7691,lng:-78.7421},
+  {n:"Gabriel's Closet Thrift Shop",c:"Cattaraugus",t:"Thrift",a:"Springville, NY 14141",ph:"TBD",h:"Call ahead to verify — community thrift store",lat:42.5088,lng:-78.6641},
+  {n:"A Second Thought Resale — Springville",c:"Cattaraugus",t:"Thrift",a:"Springville, NY 14141",ph:"TBD",h:"Call ahead to verify",lat:42.5091,lng:-78.6638},
+  {n:"Southtowns Ladd Thrift Shop",c:"Erie NY",t:"Thrift",a:"South Buffalo / South Towns area, NY",ph:"TBD",h:"Call ahead to verify — benefits LADD (Lutheran Association for Developmentally Disabled)",lat:42.8201,lng:-78.8121}
+];
+
+// ════════════════════════════════════════════════════════════
+// COLOR CONFIG — edit hex values here to change county colors
+// ════════════════════════════════════════════════════════════
+const PA_C={'Erie':'#2563EB','Crawford':'#16A34A','Venango':'#DC2626'};
+const WNY_C={'Chautauqua':'#2563EB','Cattaraugus':'#7C3AED','Erie NY':'#16A34A'};
+
+// ════════════════════════════════════════════════════════════
+// MAP + LIST ENGINE — no need to edit below this line
+// ════════════════════════════════════════════════════════════
+function mkIcon(col){
+  return L.divIcon({className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-13],
+    html:`<svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="${col}" stroke="#fff" stroke-width="2.2" opacity=".93"/></svg>`});
+}
+function mkPopup(s,C){
+  const col=C[s.c]||'#888';
+  return `<div class="pi"><div class="pc" style="color:${col}">${s.c} County</div><div class="pn">${s.n}</div><div class="pt">${s.t}</div><div class="pa">📍 <span>${s.a}</span></div>${s.ph!=='TBD'?`<div class="pp">📞 <span>${s.ph}</span></div>`:''}<div class="ph">${s.h}</div></div>`;
+}
+function colClass(county){
+  const m={'Erie':'#2563EB','Crawford':'#16A34A','Venango':'#DC2626','Chautauqua':'#2563EB','Cattaraugus':'#7C3AED','Erie NY':'#16A34A'};
+  return m[county]||'#888';
+}
+
+function initMap(mapElId,sbId,qId,cntId,listId,togId,stores,C,clat,clng,zoom){
+  const map=L.map(mapElId,{center:[clat,clng],zoom});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19}).addTo(map);
+  const markers=[];
+  stores.forEach(s=>{
+    const m=L.marker([s.lat,s.lng],{icon:mkIcon(C[s.c]||'#888')}).addTo(map).bindPopup(mkPopup(s,C),{maxWidth:270,minWidth:200});
+    m._sn=s.n;markers.push(m);
+  });
+  let vis=new Set(Object.keys(C)),atype='All',sbOpen=window.innerWidth>768;
+  const sb=document.getElementById(sbId);
+  if(!sbOpen){sb.classList.add('col');document.getElementById(togId).textContent='▶';}
+  function getFiltered(){
+    const q=(document.getElementById(qId).value||'').toLowerCase();
+    return stores.filter(s=>{
+      if(!vis.has(s.c))return false;
+      if(atype!=='All'&&!s.t.includes(atype))return false;
+      if(q&&!s.n.toLowerCase().includes(q)&&!s.a.toLowerCase().includes(q))return false;
+      return true;
+    });
+  }
+  function render(){
+    const f=getFiltered(),fn=new Set(f.map(s=>s.n));
+    document.getElementById(cntId).textContent=f.length+' store'+(f.length!==1?'s':'')+' shown';
+    const lst=document.getElementById(listId);lst.innerHTML='';
+    if(!f.length){lst.innerHTML='<div class="nr">No results</div>';}
+    f.forEach(s=>{
+      const el=document.createElement('div');el.className='si';
+      const col=colClass(s.c);
+      el.innerHTML=`<div class="sn">${s.n}</div><div class="sm"><span class="cbadge" style="background:${col}22;color:${col}">${s.c}</span><span>${s.t}</span></div>`;
+      el.onclick=()=>{
+        document.querySelectorAll('#'+listId+' .si.act').forEach(e=>e.classList.remove('act'));
+        el.classList.add('act');el.style.borderLeftColor=col;
+        const mk=markers.find(m=>m._sn===s.n);
+        if(mk){map.setView([s.lat,s.lng],15,{animate:true});mk.openPopup();}
+        if(window.innerWidth<=768){sb.classList.add('col');document.getElementById(togId).textContent='▶';sbOpen=false;setTimeout(()=>map.invalidateSize(),230);}
+      };
+      lst.appendChild(el);
+    });
+    markers.forEach(m=>{
+      const show=fn.has(m._sn);
+      m.setOpacity(show?1:.08);
+      const el=m.getElement();if(el)el.style.pointerEvents=show?'':'none';
+    });
+  }
+  window[qId.replace('-','')+'Filter']=render;
+  const filterFn=window[mapElId.replace('-map-el','')+'Filter']=render;
+  window[mapElId.replace('-map-el','')+'SetType']=function(t,btn){
+    atype=t;
+    document.querySelectorAll('#'+sbId+' .sf').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');render();
+  };
+  window[mapElId.replace('-map-el','')+'TogCo']=function(county,el){
+    if(vis.has(county)){vis.delete(county);el.classList.add('dim');}
+    else{vis.add(county);el.classList.remove('dim');}
+    render();
+  };
+  window[mapElId.replace('-map-el','')+'TogSB']=function(){
+    sbOpen=!sbOpen;sb.classList.toggle('col',!sbOpen);
+    document.getElementById(togId).textContent=sbOpen?'◀':'▶';
+    setTimeout(()=>map.invalidateSize(),230);
+  };
+  render();
+}
+
+function initList(tbodyId,lcntId,stores,C){
+  let fCounty='All',fType='All';
+  function render(){
+    const f=stores.filter(s=>{
+      if(fCounty!=='All'&&s.c!==fCounty)return false;
+      if(fType!=='All'&&!s.t.includes(fType))return false;
+      return true;
+    });
+    document.getElementById(lcntId).textContent=f.length+' store'+(f.length!==1?'s':'')+' shown';
+    const tbody=document.getElementById(tbodyId);tbody.innerHTML='';
+    f.forEach(s=>{
+      const col=C[s.c]||'#888';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td class="tn">${s.n}</td><td><span class="tbadge" style="background:${col}22;color:${col}">${s.c}</span></td><td>${s.t}</td><td>${s.a}</td><td style="white-space:nowrap">${s.ph==='TBD'?'—':s.ph}</td><td class="th">${s.h}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  const pfx=tbodyId.split('-')[0];
+  window[pfx+'ListFilter']=function(dim,val,btn){
+    if(dim==='county'){fCounty=val;document.querySelectorAll('#'+pfx+'-lf-county .lf').forEach(b=>b.classList.remove('on'));}
+    else{fType=val;document.querySelectorAll('#'+pfx+'-lf-type .lf').forEach(b=>b.classList.remove('on'));}
+    btn.classList.add('on');render();
+  };
+  render();
+}
+
+// Expose filter functions called by oninput
+function paFilter(){if(window.paFilter_inner)window.paFilter_inner();}
+function wnyFilter(){if(window.wnyFilter_inner)window.wnyFilter_inner();}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  // PA Map
+  initMap('pa-map-el','pa-sb','pa-q','pa-cnt','pa-list','pa-tog',PA_STORES,PA_C,41.65,-80.05,9);
+  // WNY Map
+  initMap('wny-map-el','wny-sb','wny-q','wny-cnt','wny-list','wny-tog',WNY_STORES,WNY_C,42.85,-78.90,9);
+  // PA List
+  initList('pa-tbody','pa-lcnt',PA_STORES,PA_C);
+  // WNY List
+  initList('wny-tbody','wny-lcnt',WNY_STORES,WNY_C);
+
+  // Wire up sidebar toggles and county toggles via closures
+  // (initMap registers them as window.MAPID_TogSB etc.)
+  // Wire oninput filters
+  document.getElementById('pa-q').addEventListener('input',()=>window['pa-map-elFilter']&&window['pa-map-elFilter']());
+  document.getElementById('wny-q').addEventListener('input',()=>window['wny-map-elFilter']&&window['wny-map-elFilter']());
+});
+
+// Expose toggle functions to inline onclick handlers
+function paTogSB(){if(window['pa-map-elTogSB'])window['pa-map-elTogSB']();}
+function wnyTogSB(){if(window['wny-map-elTogSB'])window['wny-map-elTogSB']();}
+function paTogCo(c,el){if(window['pa-map-elTogCo'])window['pa-map-elTogCo'](c,el);}
+function wnyTogCo(c,el){if(window['wny-map-elTogCo'])window['wny-map-elTogCo'](c,el);}
+function paSetType(t,btn){if(window['pa-map-elSetType'])window['pa-map-elSetType'](t,btn);}
+function wnySetType(t,btn){if(window['wny-map-elSetType'])window['wny-map-elSetType'](t,btn);}
+</script>
+</body>
+</html>
