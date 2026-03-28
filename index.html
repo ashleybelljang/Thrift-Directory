@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -123,18 +124,25 @@ footer strong{color:var(--white)}
 @media(max-width:768px){
   #hero{padding:44px 18px 36px}
   .sec{padding:44px 18px}
-  .msb{position:absolute;top:0;left:0;height:100%;z-index:400;box-shadow:4px 0 20px rgba(0,0,0,.8)}
-  .mlayout{height:460px;position:relative}
+  .mlayout{height:480px;flex-direction:row;overflow:hidden}
+  .msb{width:200px!important;min-width:200px;flex-shrink:0;position:relative;overflow:hidden}
+  .msb.col{width:0!important;min-width:0}
+  .mtog{flex-shrink:0}
+  .mwrap{flex:1;min-width:0}
   .lstsec{padding:36px 14px}
   .tbl{display:block;overflow-x:auto}
   nav a{font-size:.82rem;padding:0 11px}
   .mhdr{padding:12px 14px}
+  .sb-srch input{font-size:.72rem}
+  .sn{font-size:.74rem}
+  .sm{font-size:.64rem}
 }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
+
 <nav>
   <a href="#about">About</a>
   <a href="#tips">Tips</a>
@@ -145,6 +153,7 @@ footer strong{color:var(--white)}
 </nav>
 
 <!-- HERO -->
+
 <section id="hero">
   <div class="hi">
     <div class="eyebrow">Compiled March 2026</div>
@@ -162,6 +171,7 @@ footer strong{color:var(--white)}
 </section>
 
 <!-- ABOUT -->
+
 <section id="about" class="sec">
   <div class="sec-inner">
     <div class="sec-lbl">What Is This</div>
@@ -172,6 +182,7 @@ footer strong{color:var(--white)}
 </section>
 
 <!-- TIPS -->
+
 <section id="tips" class="sec">
   <div class="sec-inner">
     <div class="sec-lbl">Before You Go</div>
@@ -189,6 +200,7 @@ footer strong{color:var(--white)}
 </section>
 
 <!-- PA MAP -->
+
 <div id="pa-map" class="mapsec">
   <div class="mhdr">
     <div><div class="mhdr-lbl">Interactive Map</div><h2>Pennsylvania — Erie, Crawford &amp; Venango</h2></div>
@@ -217,6 +229,7 @@ footer strong{color:var(--white)}
 </div>
 
 <!-- WNY MAP -->
+
 <div id="wny-map" class="mapsec">
   <div class="mhdr">
     <div><div class="mhdr-lbl">Interactive Map</div><h2>Western New York — Chautauqua, Cattaraugus &amp; Erie NY</h2></div>
@@ -245,22 +258,23 @@ footer strong{color:var(--white)}
 </div>
 
 <!-- PA LIST -->
+
 <div id="pa-list-sec" class="lstsec">
   <div class="lsthdr">
     <div class="sec-lbl">Full Directory</div>
     <h2>Pennsylvania Stores</h2>
     <div class="lfilt" id="pa-lf-county">
-      <button class="lf on" onclick="paListFilter('county','All',this)">All Counties</button>
-      <button class="lf" onclick="paListFilter('county','Erie',this)">Erie</button>
-      <button class="lf" onclick="paListFilter('county','Crawford',this)">Crawford</button>
-      <button class="lf" onclick="paListFilter('county','Venango',this)">Venango</button>
+      <button class="lf" data-val="All" on">All Counties</button>
+      <button class="lf" data-val="Erie"">Erie</button>
+      <button class="lf" data-val="Crawford"">Crawford</button>
+      <button class="lf" data-val="Venango"">Venango</button>
     </div>
     <div class="lfilt" id="pa-lf-type">
-      <button class="lf on" onclick="paListFilter('type','All',this)">All Types</button>
-      <button class="lf" onclick="paListFilter('type','Thrift',this)">Thrift</button>
-      <button class="lf" onclick="paListFilter('type','Antique',this)">Antique</button>
-      <button class="lf" onclick="paListFilter('type','Consignment',this)">Consignment</button>
-      <button class="lf" onclick="paListFilter('type','Vintage',this)">Vintage</button>
+      <button class="lf" data-val="All" on">All Types</button>
+      <button class="lf" data-val="Thrift"">Thrift</button>
+      <button class="lf" data-val="Antique"">Antique</button>
+      <button class="lf" data-val="Consignment"">Consignment</button>
+      <button class="lf" data-val="Vintage"">Vintage</button>
     </div>
     <div class="lcnt" id="pa-lcnt"></div>
   </div>
@@ -271,22 +285,23 @@ footer strong{color:var(--white)}
 </div>
 
 <!-- WNY LIST -->
+
 <div id="wny-list-sec" class="lstsec">
   <div class="lsthdr">
     <div class="sec-lbl">Full Directory</div>
     <h2>Western New York Stores</h2>
     <div class="lfilt" id="wny-lf-county">
-      <button class="lf on" onclick="wnyListFilter('county','All',this)">All Counties</button>
-      <button class="lf" onclick="wnyListFilter('county','Chautauqua',this)">Chautauqua</button>
-      <button class="lf" onclick="wnyListFilter('county','Cattaraugus',this)">Cattaraugus</button>
-      <button class="lf" onclick="wnyListFilter('county','Erie NY',this)">Erie NY</button>
+      <button class="lf" data-val="All" on">All Counties</button>
+      <button class="lf" data-val="Chautauqua"">Chautauqua</button>
+      <button class="lf" data-val="Cattaraugus"">Cattaraugus</button>
+      <button class="lf" data-val="Erie NY"">Erie NY</button>
     </div>
     <div class="lfilt" id="wny-lf-type">
-      <button class="lf on" onclick="wnyListFilter('type','All',this)">All Types</button>
-      <button class="lf" onclick="wnyListFilter('type','Thrift',this)">Thrift</button>
-      <button class="lf" onclick="wnyListFilter('type','Antique',this)">Antique</button>
-      <button class="lf" onclick="wnyListFilter('type','Consignment',this)">Consignment</button>
-      <button class="lf" onclick="wnyListFilter('type','Vintage',this)">Vintage</button>
+      <button class="lf" data-val="All" on">All Types</button>
+      <button class="lf" data-val="Thrift"">Thrift</button>
+      <button class="lf" data-val="Antique"">Antique</button>
+      <button class="lf" data-val="Consignment"">Consignment</button>
+      <button class="lf" data-val="Vintage"">Vintage</button>
     </div>
     <div class="lcnt" id="wny-lcnt"></div>
   </div>
@@ -297,6 +312,7 @@ footer strong{color:var(--white)}
 </div>
 
 <!-- FOOTER -->
+
 <footer>
   <!-- EDIT: Footer text -->
   <p><strong>NW Pennsylvania &amp; Western NY Thrift Directory</strong> &nbsp;|&nbsp; Compiled March 2026 &nbsp;|&nbsp; Hours and store status subject to change. Always call ahead.</p>
@@ -304,11 +320,9 @@ footer strong{color:var(--white)}
 
 <script>
 // ════════════════════════════════════════════════════════════
-// STORE DATA
-// Edit stores here. Each object: n=name, c=county, t=type,
-// a=address, ph=phone, h=hours, lat=latitude, lng=longitude
-// To add: copy a line, update all fields, add comma at end
-// To remove: delete the whole line including trailing comma
+// STORE DATA — edit here to add/remove/update stores
+// n=name, c=county, t=type, a=address, ph=phone, h=hours
+// lat/lng = coordinates for the map pin
 // ════════════════════════════════════════════════════════════
 
 const PA_STORES=[
@@ -318,7 +332,6 @@ const PA_STORES=[
   {n:"Erie City Mission (French St)",c:"Erie",t:"Thrift",a:"1017 French St, Erie, PA",ph:"TBD",h:"Call ahead to verify",lat:42.1292,lng:-80.0849},
   {n:"Finders Keepers of Erie",c:"Erie",t:"Thrift",a:"1250 Brown Ave, Erie, PA",ph:"(582) 228-2189",h:"Mon–Wed 10a–6p; Thu–Fri 11a–6p; Sat 11a–5p; Sun closed",lat:42.1115,lng:-80.1091},
   {n:"Green Scene Thrift",c:"Erie",t:"Thrift",a:"1301 E Grandview Blvd, Erie, PA",ph:"TBD",h:"Tue & Thu 11a–6p only",lat:42.1012,lng:-80.0618},
-  {n:"Luxe by Lisa",c:"Erie",t:"Consignment",a:"3410 W 26th St, Erie, PA",ph:"TBD",h:"Call ahead to verify",lat:42.0891,lng:-80.1098}, 
   {n:"Mel & Tee's Secondhand & Estate",c:"Erie",t:"Thrift",a:"4915 Hillsdale Ave, Erie, PA",ph:"(814) 881-7724",h:"Call ahead to verify",lat:42.0911,lng:-80.1398},
   {n:"Rainbow Connection Thrift (EUMA)",c:"Erie",t:"Thrift",a:"1516 Buffalo Rd, Erie, PA",ph:"(814) 453-4080",h:"Mon–Thu 11a–3p; Fri–Sun closed",lat:42.1004,lng:-80.0642},
   {n:"Salvation Army — Keystone Dr",c:"Erie",t:"Thrift",a:"1944 Keystone Dr, Erie, PA",ph:"(814) 866-1787",h:"Mon–Sat (call ahead); Sun closed",lat:42.0709,lng:-80.0359},
@@ -504,145 +517,272 @@ const WNY_STORES=[
 ];
 
 // ════════════════════════════════════════════════════════════
-// COLOR CONFIG — edit hex values here to change county colors
+// COLOR CONFIG
 // ════════════════════════════════════════════════════════════
-const PA_C={'Erie':'#2563EB','Crawford':'#16A34A','Venango':'#DC2626'};
-const WNY_C={'Chautauqua':'#2563EB','Cattaraugus':'#7C3AED','Erie NY':'#16A34A'};
+const PA_C  = {Erie:'#2563EB', Crawford:'#16A34A', Venango:'#DC2626'};
+const WNY_C = {Chautauqua:'#2563EB', Cattaraugus:'#7C3AED', 'Erie NY':'#16A34A'};
 
 // ════════════════════════════════════════════════════════════
-// MAP + LIST ENGINE — no need to edit below this line
+// MAP ENGINE — rewritten for reliability
 // ════════════════════════════════════════════════════════════
-function mkIcon(col){
-  return L.divIcon({className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-13],
-    html:`<svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="${col}" stroke="#fff" stroke-width="2.2" opacity=".93"/></svg>`});
-}
-function mkPopup(s,C){
-  const col=C[s.c]||'#888';
-  return `<div class="pi"><div class="pc" style="color:${col}">${s.c} County</div><div class="pn">${s.n}</div><div class="pt">${s.t}</div><div class="pa">📍 <span>${s.a}</span></div>${s.ph!=='TBD'?`<div class="pp">📞 <span>${s.ph}</span></div>`:''}<div class="ph">${s.h}</div></div>`;
-}
-function colClass(county){
-  const m={'Erie':'#2563EB','Crawford':'#16A34A','Venango':'#DC2626','Chautauqua':'#2563EB','Cattaraugus':'#7C3AED','Erie NY':'#16A34A'};
-  return m[county]||'#888';
-}
+function buildMap(cfg) {
+  // cfg: {mapEl, sbEl, qEl, cntEl, listEl, togEl, stores, colors, lat, lng, zoom}
+  var map = L.map(cfg.mapEl, {center:[cfg.lat,cfg.lng], zoom:cfg.zoom});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom:19
+  }).addTo(map);
 
-function initMap(mapElId,sbId,qId,cntId,listId,togId,stores,C,clat,clng,zoom){
-  const map=L.map(mapElId,{center:[clat,clng],zoom});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19}).addTo(map);
-  const markers=[];
-  stores.forEach(s=>{
-    const m=L.marker([s.lat,s.lng],{icon:mkIcon(C[s.c]||'#888')}).addTo(map).bindPopup(mkPopup(s,C),{maxWidth:270,minWidth:200});
-    m._sn=s.n;markers.push(m);
+  // Build markers
+  var markers = [];
+  cfg.stores.forEach(function(s) {
+    var col = cfg.colors[s.c] || '#888';
+    var icon = L.divIcon({
+      className:'',
+      iconSize:[24,24], iconAnchor:[12,12], popupAnchor:[0,-14],
+      html:'<svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="'+col+'" stroke="#fff" stroke-width="2.2" opacity=".93"/></svg>'
+    });
+    var popup = '<div class="pi">'
+      +'<div class="pc" style="color:'+col+'">'+s.c+' County</div>'
+      +'<div class="pn">'+s.n+'</div>'
+      +'<div class="pt">'+s.t+'</div>'
+      +'<div class="pa">📍 '+s.a+'</div>'
+      +(s.ph !== 'TBD' ? '<div class="pp">📞 '+s.ph+'</div>' : '')
+      +'<div class="ph">'+s.h+'</div>'
+      +'</div>';
+    var m = L.marker([s.lat, s.lng], {icon:icon})
+      .addTo(map)
+      .bindPopup(popup, {maxWidth:270, minWidth:200});
+    m._store = s;
+    markers.push(m);
   });
-  let vis=new Set(Object.keys(C)),atype='All',sbOpen=window.innerWidth>768;
-  const sb=document.getElementById(sbId);
-  if(!sbOpen){sb.classList.add('col');document.getElementById(togId).textContent='▶';}
-  function getFiltered(){
-    const q=(document.getElementById(qId).value||'').toLowerCase();
-    return stores.filter(s=>{
-      if(!vis.has(s.c))return false;
-      if(atype!=='All'&&!s.t.includes(atype))return false;
-      if(q&&!s.n.toLowerCase().includes(q)&&!s.a.toLowerCase().includes(q))return false;
+
+  // State
+  var visCounties = {};
+  Object.keys(cfg.colors).forEach(function(k){ visCounties[k] = true; });
+  var activeType = 'All';
+
+  function getFiltered() {
+    var q = cfg.qEl.value.toLowerCase();
+    return cfg.stores.filter(function(s) {
+      if (!visCounties[s.c]) return false;
+      if (activeType !== 'All' && s.t.indexOf(activeType) === -1) return false;
+      if (q && s.n.toLowerCase().indexOf(q) === -1 && s.a.toLowerCase().indexOf(q) === -1) return false;
       return true;
     });
   }
-  function render(){
-    const f=getFiltered(),fn=new Set(f.map(s=>s.n));
-    document.getElementById(cntId).textContent=f.length+' store'+(f.length!==1?'s':'')+' shown';
-    const lst=document.getElementById(listId);lst.innerHTML='';
-    if(!f.length){lst.innerHTML='<div class="nr">No results</div>';}
-    f.forEach(s=>{
-      const el=document.createElement('div');el.className='si';
-      const col=colClass(s.c);
-      el.innerHTML=`<div class="sn">${s.n}</div><div class="sm"><span class="cbadge" style="background:${col}22;color:${col}">${s.c}</span><span>${s.t}</span></div>`;
-      el.onclick=()=>{
-        document.querySelectorAll('#'+listId+' .si.act').forEach(e=>e.classList.remove('act'));
-        el.classList.add('act');el.style.borderLeftColor=col;
-        const mk=markers.find(m=>m._sn===s.n);
-        if(mk){map.setView([s.lat,s.lng],15,{animate:true});mk.openPopup();}
-        if(window.innerWidth<=768){sb.classList.add('col');document.getElementById(togId).textContent='▶';sbOpen=false;setTimeout(()=>map.invalidateSize(),230);}
-      };
-      lst.appendChild(el);
-    });
-    markers.forEach(m=>{
-      const show=fn.has(m._sn);
-      m.setOpacity(show?1:.08);
-      const el=m.getElement();if(el)el.style.pointerEvents=show?'':'none';
+
+  function render() {
+    var filtered = getFiltered();
+    var filteredNames = {};
+    filtered.forEach(function(s){ filteredNames[s.n] = true; });
+
+    // Update count
+    cfg.cntEl.textContent = filtered.length + ' store' + (filtered.length !== 1 ? 's' : '') + ' shown';
+
+    // Update sidebar list
+    cfg.listEl.innerHTML = '';
+    if (filtered.length === 0) {
+      cfg.listEl.innerHTML = '<div class="nr">No results</div>';
+    } else {
+      filtered.forEach(function(s) {
+        var col = cfg.colors[s.c] || '#888';
+        var div = document.createElement('div');
+        div.className = 'si';
+        div.innerHTML = '<div class="sn">'+s.n+'</div>'
+          +'<div class="sm"><span class="cbadge" style="background:'+col+'22;color:'+col+'">'+s.c+'</span>'
+          +'<span>'+s.t+'</span></div>';
+        div.addEventListener('click', function() {
+          // Clear active
+          var all = cfg.listEl.querySelectorAll('.si');
+          all.forEach(function(el){ el.classList.remove('act'); el.style.borderLeftColor='transparent'; });
+          div.classList.add('act');
+          div.style.borderLeftColor = col;
+          // Find and open marker
+          for (var i=0; i<markers.length; i++) {
+            if (markers[i]._store.n === s.n) {
+              map.setView([s.lat, s.lng], 14, {animate:true});
+              markers[i].openPopup();
+              break;
+            }
+          }
+        });
+        cfg.listEl.appendChild(div);
+      });
+    }
+
+    // Update marker visibility
+    markers.forEach(function(m) {
+      var show = !!filteredNames[m._store.n];
+      m.setOpacity(show ? 1 : 0.07);
+      var el = m.getElement();
+      if (el) el.style.pointerEvents = show ? '' : 'none';
     });
   }
-  window[qId.replace('-','')+'Filter']=render;
-  const filterFn=window[mapElId.replace('-map-el','')+'Filter']=render;
-  window[mapElId.replace('-map-el','')+'SetType']=function(t,btn){
-    atype=t;
-    document.querySelectorAll('#'+sbId+' .sf').forEach(b=>b.classList.remove('on'));
-    btn.classList.add('on');render();
-  };
-  window[mapElId.replace('-map-el','')+'TogCo']=function(county,el){
-    if(vis.has(county)){vis.delete(county);el.classList.add('dim');}
-    else{vis.add(county);el.classList.remove('dim');}
-    render();
-  };
-  window[mapElId.replace('-map-el','')+'TogSB']=function(){
-    sbOpen=!sbOpen;sb.classList.toggle('col',!sbOpen);
-    document.getElementById(togId).textContent=sbOpen?'◀':'▶';
-    setTimeout(()=>map.invalidateSize(),230);
-  };
+
+  // Search input
+  cfg.qEl.addEventListener('input', render);
+
+  // Type filter buttons
+  var sfBtns = cfg.sbEl.querySelectorAll('.sf');
+  sfBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      sfBtns.forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+      activeType = btn.textContent === 'Consign' ? 'Consignment' : btn.textContent;
+      render();
+    });
+  });
+
+  // County legend toggles — find them in the map header
+  var mapSection = cfg.mapEl.closest ? cfg.mapEl.closest('.mapsec') : cfg.mapEl.parentElement.parentElement.parentElement;
+  if (mapSection) {
+    var clegs = mapSection.querySelectorAll('.cleg');
+    clegs.forEach(function(leg) {
+      leg.addEventListener('click', function() {
+        // Find county name from the text
+        var county = leg.textContent.trim();
+        // Handle "Erie NY" vs "Erie"
+        if (visCounties[county] !== undefined) {
+          visCounties[county] = !visCounties[county];
+          leg.classList.toggle('dim', !visCounties[county]);
+        } else {
+          // Try partial match
+          Object.keys(visCounties).forEach(function(k) {
+            if (k.indexOf(county) !== -1 || county.indexOf(k) !== -1) {
+              visCounties[k] = !visCounties[k];
+              leg.classList.toggle('dim', !visCounties[k]);
+            }
+          });
+        }
+        render();
+      });
+    });
+  }
+
+  // Sidebar toggle button
+  cfg.togEl.addEventListener('click', function() {
+    var isCollapsed = cfg.sbEl.classList.contains('col');
+    if (isCollapsed) {
+      cfg.sbEl.classList.remove('col');
+      cfg.togEl.textContent = window.innerWidth <= 768 ? '▲ Hide list' : '◀';
+    } else {
+      cfg.sbEl.classList.add('col');
+      cfg.togEl.textContent = window.innerWidth <= 768 ? '▼ Show list' : '▶';
+    }
+    setTimeout(function(){ map.invalidateSize(); }, 250);
+  });
+
+  // Initial render
   render();
 }
 
-function initList(tbodyId,lcntId,stores,C){
-  let fCounty='All',fType='All';
-  function render(){
-    const f=stores.filter(s=>{
-      if(fCounty!=='All'&&s.c!==fCounty)return false;
-      if(fType!=='All'&&!s.t.includes(fType))return false;
+// ════════════════════════════════════════════════════════════
+// LIST ENGINE
+// ════════════════════════════════════════════════════════════
+function buildList(cfg) {
+  // cfg: {tbodyEl, cntEl, lfCountyEl, lfTypeEl, stores, colors}
+  var fCounty = 'All', fType = 'All';
+
+  function render() {
+    var filtered = cfg.stores.filter(function(s) {
+      if (fCounty !== 'All' && s.c !== fCounty) return false;
+      if (fType !== 'All' && s.t.indexOf(fType) === -1) return false;
       return true;
     });
-    document.getElementById(lcntId).textContent=f.length+' store'+(f.length!==1?'s':'')+' shown';
-    const tbody=document.getElementById(tbodyId);tbody.innerHTML='';
-    f.forEach(s=>{
-      const col=C[s.c]||'#888';
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td class="tn">${s.n}</td><td><span class="tbadge" style="background:${col}22;color:${col}">${s.c}</span></td><td>${s.t}</td><td>${s.a}</td><td style="white-space:nowrap">${s.ph==='TBD'?'—':s.ph}</td><td class="th">${s.h}</td>`;
-      tbody.appendChild(tr);
+    cfg.cntEl.textContent = filtered.length + ' store' + (filtered.length !== 1 ? 's' : '') + ' shown';
+    cfg.tbodyEl.innerHTML = '';
+    filtered.forEach(function(s) {
+      var col = cfg.colors[s.c] || '#888';
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td class="tn">'+s.n+'</td>'
+        +'<td><span class="tbadge" style="background:'+col+'22;color:'+col+'">'+s.c+'</span></td>'
+        +'<td>'+s.t+'</td>'
+        +'<td>'+s.a+'</td>'
+        +'<td style="white-space:nowrap">'+(s.ph==='TBD'?'—':s.ph)+'</td>'
+        +'<td class="th">'+s.h+'</td>';
+      cfg.tbodyEl.appendChild(tr);
     });
   }
-  const pfx=tbodyId.split('-')[0];
-  window[pfx+'ListFilter']=function(dim,val,btn){
-    if(dim==='county'){fCounty=val;document.querySelectorAll('#'+pfx+'-lf-county .lf').forEach(b=>b.classList.remove('on'));}
-    else{fType=val;document.querySelectorAll('#'+pfx+'-lf-type .lf').forEach(b=>b.classList.remove('on'));}
-    btn.classList.add('on');render();
-  };
+
+  // County filter buttons
+  cfg.lfCountyEl.querySelectorAll('.lf').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      cfg.lfCountyEl.querySelectorAll('.lf').forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+      fCounty = btn.getAttribute('data-val') || btn.textContent.trim();
+      if (fCounty === 'All Counties') fCounty = 'All';
+      render();
+    });
+  });
+
+  // Type filter buttons
+  cfg.lfTypeEl.querySelectorAll('.lf').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      cfg.lfTypeEl.querySelectorAll('.lf').forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+      fType = btn.getAttribute('data-val') || btn.textContent.trim();
+      if (fType === 'All Types') fType = 'All';
+      render();
+    });
+  });
+
   render();
 }
 
-// Expose filter functions called by oninput
-function paFilter(){if(window.paFilter_inner)window.paFilter_inner();}
-function wnyFilter(){if(window.wnyFilter_inner)window.wnyFilter_inner();}
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', function() {
 
-window.addEventListener('DOMContentLoaded',()=>{
   // PA Map
-  initMap('pa-map-el','pa-sb','pa-q','pa-cnt','pa-list','pa-tog',PA_STORES,PA_C,41.65,-80.05,9);
+  buildMap({
+    mapEl:  document.getElementById('pa-map-el'),
+    sbEl:   document.getElementById('pa-sb'),
+    qEl:    document.getElementById('pa-q'),
+    cntEl:  document.getElementById('pa-cnt'),
+    listEl: document.getElementById('pa-list'),
+    togEl:  document.getElementById('pa-tog'),
+    stores: PA_STORES,
+    colors: PA_C,
+    lat: 41.65, lng: -80.05, zoom: 9
+  });
+
   // WNY Map
-  initMap('wny-map-el','wny-sb','wny-q','wny-cnt','wny-list','wny-tog',WNY_STORES,WNY_C,42.85,-78.90,9);
+  buildMap({
+    mapEl:  document.getElementById('wny-map-el'),
+    sbEl:   document.getElementById('wny-sb'),
+    qEl:    document.getElementById('wny-q'),
+    cntEl:  document.getElementById('wny-cnt'),
+    listEl: document.getElementById('wny-list'),
+    togEl:  document.getElementById('wny-tog'),
+    stores: WNY_STORES,
+    colors: WNY_C,
+    lat: 42.85, lng: -78.90, zoom: 9
+  });
+
   // PA List
-  initList('pa-tbody','pa-lcnt',PA_STORES,PA_C);
+  buildList({
+    tbodyEl:   document.getElementById('pa-tbody'),
+    cntEl:     document.getElementById('pa-lcnt'),
+    lfCountyEl: document.getElementById('pa-lf-county'),
+    lfTypeEl:   document.getElementById('pa-lf-type'),
+    stores: PA_STORES,
+    colors: PA_C
+  });
+
   // WNY List
-  initList('wny-tbody','wny-lcnt',WNY_STORES,WNY_C);
+  buildList({
+    tbodyEl:   document.getElementById('wny-tbody'),
+    cntEl:     document.getElementById('wny-lcnt'),
+    lfCountyEl: document.getElementById('wny-lf-county'),
+    lfTypeEl:   document.getElementById('wny-lf-type'),
+    stores: WNY_STORES,
+    colors: WNY_C
+  });
 
-  // Wire up sidebar toggles and county toggles via closures
-  // (initMap registers them as window.MAPID_TogSB etc.)
-  // Wire oninput filters
-  document.getElementById('pa-q').addEventListener('input',()=>window['pa-map-elFilter']&&window['pa-map-elFilter']());
-  document.getElementById('wny-q').addEventListener('input',()=>window['wny-map-elFilter']&&window['wny-map-elFilter']());
 });
-
-// Expose toggle functions to inline onclick handlers
-function paTogSB(){if(window['pa-map-elTogSB'])window['pa-map-elTogSB']();}
-function wnyTogSB(){if(window['wny-map-elTogSB'])window['wny-map-elTogSB']();}
-function paTogCo(c,el){if(window['pa-map-elTogCo'])window['pa-map-elTogCo'](c,el);}
-function wnyTogCo(c,el){if(window['wny-map-elTogCo'])window['wny-map-elTogCo'](c,el);}
-function paSetType(t,btn){if(window['pa-map-elSetType'])window['pa-map-elSetType'](t,btn);}
-function wnySetType(t,btn){if(window['wny-map-elSetType'])window['wny-map-elSetType'](t,btn);}
 </script>
+
 </body>
 </html>
